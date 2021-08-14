@@ -177,5 +177,5 @@ function createElement(element, attributes = null) {
 }
 
 function pageScroll() {
-        window.scrollBy(0,1);
+        setTimeout(function() {window.scrollBy(0,1);}, 2000)
 }
