@@ -1,0 +1,125 @@
+:root {
+  --column-width: 45vw;
+  --animation-speed: 200ms;
+}
+
+body {
+  padding: 0;
+  background-color: black;
+  color: white;
+}
+
+#column_container {
+  display: flex;
+  justify-content: center;
+
+}
+
+.column {
+  margin: 5px;
+  width: var(--column-width);
+}
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 10px;
+  transition: transform var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  box-shadow: 0px 10px 30px 0px black;
+}
+.card:hover {
+  transform: scale(1.05) perspective(7cm) rotateX(2deg);
+  z-index: 99;
+}
+.card.long:hover {
+  transform: scale(1.03) perspective(55cm) rotateX(1.5deg);
+}
+.card.longer:hover {
+  transform: scale(1.01) perspective(70cm) rotateX(0.1deg);
+}
+
+.content {
+  background-color: black;
+  position: relative;
+  display: block;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.content:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  background: linear-gradient(0deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0) 20px);
+  filter: blur(1px);
+  transform: scale(10) rotate(45deg) translateY(-55%);
+  transition: transform var(--animation-speed) cubic-bezier(0,0,0,1.5);
+}
+.card:hover .content:before {
+  transform: scale(10) rotate(45deg) translateY(-52%);
+}
+.preview {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+}
+.art {
+  position: absolute;
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.infobox {
+  position: absolute;
+  bottom: 0;
+  transition: bottom var(--animation-speed) cubic-bezier(0,0,0,1.5);
+}
+.card:hover .infobox {
+  bottom: -22px;
+}
+
+.textinfo {
+  position: relative;
+  display: inline-block;
+  height: 20px;
+  margin: 2px;
+  color: black;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.textinfo:before {
+  content: "";
+  position: absolute;
+  height: 40px;
+  width: 100%;
+  background-color: white;
+  border-radius: 0 0 8px 8px;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+}
+.upvotes:before { background-color: lightgreen; }
+.downvotes:before { background-color: lightcoral; }
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: black;
+}
+::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: blue;
+}
+
+#tags {
+  width: 500px;
+}

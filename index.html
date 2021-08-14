@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111111">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="settings">
+      Tags:<br/>
+      <input type="text" id="tags"><br/>
+      <input type="range" id="column_width" min="10" max="90" value="90" step="1"><br />
+      <input type="number" id="column_count" min="1" max="10" value="2"><br />
+      <button type="button" onclick="start()">Give Me!</button>
+    </div>
+    <div id="column_container"/>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+  </body>
+</html>
