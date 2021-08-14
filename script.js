@@ -168,9 +168,14 @@ function createCard(data) {
 function isArtist(tag) {
   return tag.includes('artist:');
 }
+
 function createElement(element, attributes = null) {
   let output = document.createElement(element);
   if (attributes == null) return output;
   for (a in attributes) output.setAttribute(a, attributes[a]);
   return output;
+}
+
+function pageScroll() {
+        window.scrollBy(0,1);
 }
