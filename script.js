@@ -23,7 +23,7 @@ document.getElementById('column_count').addEventListener('input', function() {
   redraw();
 });
 
-function start(tagstring) {
+function start() {
   window.page = 1;
   window.index = 0;
   window.data = null;
@@ -37,18 +37,6 @@ function start(tagstring) {
   window.intervalId = window.setInterval(renderimage, 100);
 }
 
-function redraw() {
-  column_container.innerHTML = '';
-  for (var i = 0; i < window.column_count; i++) {
-    column_container.appendChild(createElement('div', {'class':'column'}));
-  }
-  var columns = document.getElementsByClassName('column')
-  for (i=0; i < window.index; i++){
-    var column = columns[i % columns.length]
-    column.appendChild(createCard(window.data[i]));
-  }
-}
-
 function getdata() {
   var url = new URL('https://derpibooru.org/api/v1/json/search/images');
   url.searchParams.set('per_page', '50');
@@ -57,6 +45,7 @@ function getdata() {
   url.searchParams.set('filter_id', document.getElementById('filter_id').value); // all under 56027
   url.searchParams.set('sf', 'score');
   $.getJSON(url.href, function(APIreply) {
+    if (APIreply.images.length == 0) return;
     if (window.data == null) {
       window.data = APIreply.images;
     }
@@ -64,26 +53,35 @@ function getdata() {
       window.data = window.data.concat(APIreply.images)
     }
     console.log(APIreply)
-    console.log('page = '+window.page)
     window.page++
     window.paused = false;
   });
 }
 
-var columns = document.getElementsByClassName('column')
+function redraw() {
+  column_container.innerHTML = '';
+  for (var i = 0; i < window.column_count; i++) {
+    column_container.appendChild(createElement('div', {'class':'column'}));
+  }
+
+  for (i=0; i < window.index; i++){
+    getShortestColumn().appendChild(createCard(window.data[i]));
+  }
+}
+
+
 function renderimage() {
   if (window.paused) return;
 
-  let distToBottom = document.body.offsetHeight - window.scrollY - window.innerHeight;
-  if (distToBottom > window.innerHeight*2) return;
+  let distToBottom = document.body.offsetHeight - window.scrollY;
+  if (distToBottom > window.innerHeight*10) return;
 
   if (window.data == null || window.data[index] == undefined) {
     getdata();
     window.paused = true;
     return;
   }
-  var column = columns[index % columns.length]
-  column.appendChild(createCard(window.data[index]));
+  getShortestColumn().appendChild(createCard(window.data[index]));
   window.index++;
 }
 
@@ -91,7 +89,7 @@ function createCard(data) {
   let card = createElement('div', {'class':'card'})
   if (data.aspect_ratio < .5) card.classList.add('long');
   if (data.aspect_ratio < .1) card.classList.add('longer');
-  card.style.height = 'calc(var(--column-width)/'+data.aspect_ratio+')'
+
 
   let infobox = createElement('div', {'class':'infobox'});
   let upvotes = createElement('div', {'class':'textinfo upvotes'});
@@ -117,24 +115,28 @@ function createCard(data) {
   infobox.appendChild(artist);
 
   let content = createElement('div', {'class': 'content'});
+  content.style.height = 'calc(var(--column-width)/'+data.aspect_ratio+')'
   switch (data.representations.tall.split('.').pop()) {
     case 'png':
     case 'jpg':
     case 'gif':
-      art = createElement('img', {
-        'class': 'art',
-        'src': data.representations.tall,
-        'id': 'a'+index,
-      });
-      art.addEventListener('load', function(e){
-        e.target.style.position = 'relative';
-        document.getElementById('p'+e.target.id).remove();
-      })
       preview = createElement('img', {
         'class': 'preview',
         'src': data.representations.thumb_tiny,
-        'id': 'pa'+index
+        'loading': 'eager',
+        'id': 'p'+index
       });
+      content.appendChild(preview);
+      art = createElement('img', {
+        'class': 'art',
+        'src': data.representations.tall,
+        'loading': 'lazy',
+        'id': 'a'+index,
+      });
+      art.addEventListener('load', function(e){
+        document.getElementById('p'+e.target.id.substring(1)).remove();
+      });
+      content.appendChild(art);
       break;
     case 'mp4':
     case 'webm':
@@ -146,20 +148,12 @@ function createCard(data) {
         'muted':'',
         'loop':''
       });
-      preview = createElement('video', {
-        'class': 'preview',
-        'src': data.representations.thumb_tiny,
-        'id': 'pa'+index,
-        'autoplay':'',
-        'muted':'',
-        'loop':''
-      });
+      art.style.position = 'relative';
+      content.appendChild(art);
       break;
     default:
       console.log('Unknown format on '+link);
   }
-  content.appendChild(art);
-  content.appendChild(preview);
   card.appendChild(infobox);
   card.appendChild(content);
   return card;
@@ -177,5 +171,23 @@ function createElement(element, attributes = null) {
 }
 
 function pageScroll() {
-        setTimeout(function() {window.scrollBy(0,1);}, 2000)
+  setTimeout(function() {window.scrollBy(0,1);}, 2000)
+}
+
+function getShortestColumn() {
+  var columns = document.getElementsByClassName('column');
+  var output;
+  var minHeight;
+  for (i=0; i < columns.length; i++) {
+    var currentHeight = 0;
+    for (j = 0; j < columns[i].children.length; j++) {
+      currentHeight += columns[i].children[j].offsetHeight;
+    }
+    if (minHeight == undefined) minHeight = currentHeight
+    if (currentHeight <= minHeight) {
+      minHeight = currentHeight;
+      output = columns[i];
+    }
+  }
+  return output;
 }
