@@ -4,7 +4,7 @@ var data;
 var paused;
 var intervalId;
 var column_count = 2;
-var column_width = 45;
+var column_width = 90;
 var column_container = document.getElementById('column_container');
 let root = document.documentElement;
 
@@ -54,7 +54,7 @@ function getdata() {
   url.searchParams.set('per_page', '50');
   url.searchParams.set('page', window.page);
   url.searchParams.set('q', window.tags);
-  url.searchParams.set('filter_id', '100073'); // all under 56027
+  url.searchParams.set('filter_id', document.getElementById('filter_id').value); // all under 56027
   url.searchParams.set('sf', 'score');
   $.getJSON(url.href, function(APIreply) {
     if (window.data == null) {
