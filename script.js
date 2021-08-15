@@ -8,6 +8,7 @@ var column_width = 90;
 var column_container = document.getElementById('column_container');
 let root = document.documentElement;
 
+// derekireba
 
 document.getElementById('tags').addEventListener("keyup", function(event) {
   if (event.keyCode === 13) start();
@@ -92,18 +93,25 @@ function createCard(data) {
 
   // Building infobox
   let infobox = createElement('div', {'class':'infobox'});
+  let groupLeft = createElement('div');
+  infobox.appendChild(groupLeft);
+  let groupCenter = createElement('div');
+  infobox.appendChild(groupCenter);
+  let groupRight = createElement('div');
+  infobox.appendChild(groupRight);
+
   let score = createElement('div', {'class':'textinfo score'});
+  groupLeft.appendChild(score);
   score.innerHTML = formatNumber(data.score);
-  infobox.appendChild(score);
+
   let link = createElement('a', {
     'class': 'textinfo link',
     'href': 'https://derpibooru.org/images/'+data.id,
     'target': '_blank',
     'rel':'noopener noreferrer'
   });
-  infobox.appendChild(link);
+  groupCenter.appendChild(link);
 
-  
   let artist = createElement('div', {'class':'textinfo artist dropdown'});
   var artists = data.tags.filter(isArtist);
   for (var i = 0; i < artists.length; i++) {
@@ -116,7 +124,7 @@ function createCard(data) {
       document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
       start();
     });
-    infobox.appendChild(artist);
+    groupRight.appendChild(artist);
   }
   if (artists.length > 1) {
     artistList = createElement('div', {'class':'artist-list'})
@@ -130,7 +138,7 @@ function createCard(data) {
       artistList.appendChild(listItem);
     }
     artist.appendChild(artistList);
-    infobox.appendChild(artist);
+    groupRight.appendChild(artist);
   }
 
   let tag = createElement('div', {'class':'textinfo tag dropdown'});
@@ -146,7 +154,7 @@ function createCard(data) {
     tagList.appendChild(listItem);
   }
   tag.appendChild(tagList);
-  infobox.appendChild(tag);
+  groupRight.appendChild(tag);
 
 
 

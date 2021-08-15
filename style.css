@@ -97,13 +97,13 @@ body {
   transition: all var(--animation-speed) cubic-bezier(0,0,0,1.5);
 }
 .card:hover .infobox {
-  bottom: -22px;
+  bottom: -19px;
   opacity: 1;
 }
 .textinfo {
   position: relative;
   background-color: white;
-  display: inline-block;
+  display: inline;
   height: 17px;
   margin: 2px;
   color: black;
@@ -121,6 +121,9 @@ body {
   text-align: right;
   opacity: 0;
   transition: all var(--animation-speed) cubic-bezier(0,0,0,1.5);
+}
+.artist > * {
+  right: -24px;
 }
 .dropdown:hover * {
   pointer-events: auto;
