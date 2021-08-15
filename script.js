@@ -92,12 +92,9 @@ function createCard(data) {
 
   // Building infobox
   let infobox = createElement('div', {'class':'infobox'});
-  let upvotes = createElement('div', {'class':'textinfo upvotes'});
-  upvotes.innerHTML = data.upvotes;
-  infobox.appendChild(upvotes);
-  let downvotes = createElement('div', {'class':'textinfo downvotes'});
-  downvotes.innerHTML = data.downvotes;
-  infobox.appendChild(downvotes);
+  let score = createElement('div', {'class':'textinfo score'});
+  score.innerHTML = data.score;
+  infobox.appendChild(score);
   let link = createElement('a', {
     'class': 'textinfo',
     'href': 'https://derpibooru.org/images/'+data.id,
@@ -107,15 +104,16 @@ function createCard(data) {
   link.innerHTML = 'view on site';
   infobox.appendChild(link);
 
-  let artist = createElement('div', {'class':'textinfo artist'});
+  let artist = createElement('div', {'class':'textinfo artist dropdown'});
   var artists = data.tags.filter(isArtist);
   for (var i = 0; i < artists.length; i++) {
     artists[i] = artists[i].substring(7);
   }
   if (artists.length == 1) {
     artist.innerHTML = artists;
-    artist.addEventListener('click', function() {
-      document.getElementById('tags').value = artists;
+    artist.style.cursor='pointer';
+    artist.addEventListener('click', function(e) {
+      document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
       start();
     });
     infobox.appendChild(artist);
@@ -123,14 +121,35 @@ function createCard(data) {
   if (artists.length > 1) {
     artist.innerHTML = 'show artists';
     artistList = createElement('div', {'class':'artist-list'})
-    for (var i = 0; i < artists.length && i < 200; i++) {
-      listItem = createElement('div', {'class':'floatinfo'})
+    for (var i = 0; i < artists.length && i < 50; i++) {
+      listItem = createElement('div', {'class':'floatinfo'});
       listItem.innerHTML = artists[i];
+      listItem.addEventListener('click', function(e) {
+        document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
+        start();
+      });
       artistList.appendChild(listItem);
     }
     artist.appendChild(artistList);
     infobox.appendChild(artist);
   }
+
+  let tag = createElement('div', {'class':'textinfo tag dropdown'});
+  var tags = data.tags;
+  tag.innerHTML = 'show tags';
+  tagList = createElement('div', {'class':'tag-list'})
+  for (var i = 0; i < tags.length && i < 50; i++) {
+    listItem = createElement('div', {'class':'floatinfo'});
+    listItem.innerHTML = tags[i];
+    listItem.addEventListener('click', function(e) {
+      document.getElementById('tags').value = e.target.innerHTML;
+      start();
+    });
+    tagList.appendChild(listItem);
+  }
+  tag.appendChild(tagList);
+  infobox.appendChild(tag);
+
 
 
   // Building content
