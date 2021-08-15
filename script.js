@@ -93,24 +93,24 @@ function createCard(data) {
   // Building infobox
   let infobox = createElement('div', {'class':'infobox'});
   let score = createElement('div', {'class':'textinfo score'});
-  score.innerHTML = data.score;
+  score.innerHTML = formatNumber(data.score);
   infobox.appendChild(score);
   let link = createElement('a', {
-    'class': 'textinfo',
+    'class': 'textinfo link',
     'href': 'https://derpibooru.org/images/'+data.id,
     'target': '_blank',
     'rel':'noopener noreferrer'
   });
-  link.innerHTML = 'view on site';
   infobox.appendChild(link);
 
+  
   let artist = createElement('div', {'class':'textinfo artist dropdown'});
   var artists = data.tags.filter(isArtist);
   for (var i = 0; i < artists.length; i++) {
     artists[i] = artists[i].substring(7);
   }
   if (artists.length == 1) {
-    artist.innerHTML = artists;
+    artist.innerHTML = '&nbsp;'+artists;
     artist.style.cursor='pointer';
     artist.addEventListener('click', function(e) {
       document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
@@ -119,7 +119,6 @@ function createCard(data) {
     infobox.appendChild(artist);
   }
   if (artists.length > 1) {
-    artist.innerHTML = 'show artists';
     artistList = createElement('div', {'class':'artist-list'})
     for (var i = 0; i < artists.length && i < 50; i++) {
       listItem = createElement('div', {'class':'floatinfo'});
@@ -135,8 +134,7 @@ function createCard(data) {
   }
 
   let tag = createElement('div', {'class':'textinfo tag dropdown'});
-  var tags = data.tags;
-  tag.innerHTML = 'show tags';
+  var tags = data.tags.filter(isNotArtist);
   tagList = createElement('div', {'class':'tag-list'})
   for (var i = 0; i < tags.length && i < 50; i++) {
     listItem = createElement('div', {'class':'floatinfo'});
@@ -201,18 +199,25 @@ function createCard(data) {
 function isArtist(tag) {
   return tag.includes('artist:');
 }
-
+function isNotArtist(tag) {
+  return !tag.includes('artist:');
+}
+function formatNumber(num) {
+  if (num < 1000) return num;
+  if (num < 10000) return Math.round(num/100)/10+'k';
+  if (num < 1000000) return Math.round(num/1000)+'k';
+  if (num < 10000000) return Math.round(num/100000)/10+'M';
+  Math.round(num/1000000)+'M';
+}
 function createElement(element, attributes = null) {
   let output = document.createElement(element);
   if (attributes == null) return output;
   for (a in attributes) output.setAttribute(a, attributes[a]);
   return output;
 }
-
 function pageScroll() {
   setTimeout(function() {window.scrollBy(0,1);}, 2000)
 }
-
 function getShortestColumn() {
   var columns = document.getElementsByClassName('column');
   var output;
