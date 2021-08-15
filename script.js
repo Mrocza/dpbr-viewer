@@ -90,7 +90,7 @@ function createCard(data) {
   if (data.aspect_ratio < .5) card.classList.add('long');
   if (data.aspect_ratio < .1) card.classList.add('longer');
 
-
+  // Building infobox
   let infobox = createElement('div', {'class':'infobox'});
   let upvotes = createElement('div', {'class':'textinfo upvotes'});
   upvotes.innerHTML = data.upvotes;
@@ -106,14 +106,34 @@ function createCard(data) {
   });
   link.innerHTML = 'view on site';
   infobox.appendChild(link);
-  let artist = createElement('div', {'class':'textinfo artist'});
-  artist.innerHTML = data.tags.filter(isArtist);
-  artist.addEventListener('click', function() {
-    document.getElementById('tags').value = data.tags.filter(isArtist);
-    start();
-  })
-  infobox.appendChild(artist);
 
+  let artist = createElement('div', {'class':'textinfo artist'});
+  var artists = data.tags.filter(isArtist);
+  for (var i = 0; i < artists.length; i++) {
+    artists[i] = artists[i].substring(7);
+  }
+  if (artists.length == 1) {
+    artist.innerHTML = artists;
+    artist.addEventListener('click', function() {
+      document.getElementById('tags').value = artists;
+      start();
+    });
+    infobox.appendChild(artist);
+  }
+  if (artists.length > 1) {
+    artist.innerHTML = 'show artists';
+    artistList = createElement('div', {'class':'artist-list'})
+    for (var i = 0; i < artists.length && i < 200; i++) {
+      listItem = createElement('div', {'class':'floatinfo'})
+      listItem.innerHTML = artists[i];
+      artistList.appendChild(listItem);
+    }
+    artist.appendChild(artistList);
+    infobox.appendChild(artist);
+  }
+
+
+  // Building content
   let content = createElement('div', {'class': 'content'});
   content.style.height = 'calc(var(--column-width)/'+data.aspect_ratio+')'
   switch (data.representations.tall.split('.').pop()) {
@@ -134,6 +154,7 @@ function createCard(data) {
         'id': 'a'+index,
       });
       art.addEventListener('load', function(e){
+        // Remove preview image when main content is loaded
         document.getElementById('p'+e.target.id.substring(1)).remove();
       });
       content.appendChild(art);
@@ -148,11 +169,10 @@ function createCard(data) {
         'muted':'',
         'loop':''
       });
-      art.style.position = 'relative';
       content.appendChild(art);
       break;
     default:
-      console.log('Unknown format on '+link);
+      console.log('Unknown format on '+data.id);
   }
   card.appendChild(infobox);
   card.appendChild(content);
