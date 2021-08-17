@@ -161,7 +161,7 @@ function createCard(data) {
   // Building content
   let content = createElement('div', {'class': 'content'});
   content.style.height = 'calc(var(--column-width)/'+data.aspect_ratio+')'
-  switch (data.representations.full.split('.').pop()) {
+  switch (data.representations.tall.split('.').pop()) {
     case 'png':
     case 'jpg':
     case 'gif':
@@ -174,7 +174,7 @@ function createCard(data) {
       content.appendChild(preview);
       art = createElement('img', {
         'class': 'art',
-        'src': data.representations.full,
+        'src': data.representations.tall,
         'loading': 'lazy',
         'id': 'a'+index,
       });
@@ -188,7 +188,7 @@ function createCard(data) {
     case 'webm':
       art = createElement('video', {
         'class': 'art',
-        'src': data.representations.full,
+        'src': data.representations.tall,
         'id': 'a'+index,
         'autoplay':'',
         'muted':'',
