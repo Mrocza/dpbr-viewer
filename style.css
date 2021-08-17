@@ -1,35 +1,33 @@
 :root {
-  --column-width: 45vw;
+  --column-width: 40vw;
   --animation-speed: 200ms;
+  --animation: var(--animation-speed) cubic-bezier(0,0,0,1.5);
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600&display=swap');
-
 body {
-
   font-family: 'Josefin Sans', sans-serif;
   padding: 0;
   background-color: black;
   color: white;
+  user-select: none;
 }
 
 #column_container {
   display: flex;
   justify-content: center;
-
+  margin-left: 5vw;
+  margin-right: 5vw;
 }
-
 .column {
-  margin: 5px;
   width: var(--column-width);
+  margin: .5vw;
 }
 
 .card {
   position: relative;
   display: block;
   width: 100%;
-  margin: 10px;
-  transition: transform var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  margin: 1vw;
+  transition: transform var(--animation);
   box-shadow: 0px 10px 30px 0px black;
 }
 .card:hover {
@@ -44,12 +42,12 @@ body {
 }
 
 .content {
-  width: 100%;
-  background-color: #090913;
   position: relative;
   display: block;
+  width: 100%;
   border-radius: 8px;
   overflow: hidden;
+  background-color: #090913;
   box-shadow: 0px 0px 15px 0px black;
 }
 .content:before {
@@ -63,7 +61,7 @@ body {
   background: linear-gradient(0deg, rgba(255,255,255,0.1) 0, rgba(255,255,255,0) 20px);
   filter: blur(1px);
   transform: scale(10) rotate(45deg) translateY(-55%);
-  transition: transform var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  transition: transform var(--animation);
 }
 .card:hover .content:before {
   transform: scale(10) rotate(45deg) translateY(-52%);
@@ -88,13 +86,13 @@ body {
   object-fit: cover;
 }
 .infobox {
-  display: flex;
-  justify-content: space-between;
   position: absolute;
   bottom: 0;
+  display: flex;
+  justify-content: space-between;
   width: 100%;
   opacity: 0;
-  transition: all var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  transition: all var(--animation);
 }
 .card:hover .infobox {
   bottom: -19px;
@@ -103,8 +101,10 @@ body {
 .textinfo {
   position: relative;
   background-color: white;
+  background-position: 1px 8px;
+  background-size: 18px;
+  background-repeat: no-repeat;
   display: inline;
-  height: 17px;
   margin: 2px;
   color: black;
   padding-left: 5px;
@@ -112,19 +112,34 @@ body {
   padding-top: 10px;
   border-radius: 8px;
 }
+.link {
+  background-image: url('out.svg');
+  padding-left: 15px;
+}
+.artist {
+  background-image: url('artist.svg');
+  padding-left: 15px;
+}
+.tag {
+  background-image: url('tag.svg');
+  padding-left: 15px;
+}
+
 .dropdown > * {
   pointer-events: none;
   position: absolute;
   right: 0;
-  top: 0%;
+  top: 0;
   width: var(--column-width);
   text-align: right;
   opacity: 0;
-  transition: all var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  transition:
+    top var(--animation),
+    opacity var(--animation),
+    pointer-events var(--animation-speed) step-end 500ms;
+
 }
-.artist > * {
-  right: -24px;
-}
+.artist > * { right: -24px; }
 .dropdown:hover * {
   pointer-events: auto;
   opacity: 1;
@@ -144,41 +159,19 @@ body {
   box-shadow: 0 0 10px 0 black;
   cursor: pointer;
 }
-.link {
-  background-image: url('out.svg');
-  background-position: 1px 8px;
-  background-size: 18px;
-  background-repeat: no-repeat;
-  padding-left: 15px;
-}
-.artist {
-  background-image: url('artist.svg');
-  background-position: 1px 8px;
-  background-size: 18px;
-  background-repeat: no-repeat;
-  padding-left: 15px;
-}
-.tag {
-  background-image: url('tag.svg');
-  background-position: 1px 8px;
-  background-size: 18px;
-  background-repeat: no-repeat;
-  padding-left: 15px;
-}
-
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: black;
 }
 ::-webkit-scrollbar-thumb {
   background: white;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: blue;
+  background: navy;
 }
 
 #tags {

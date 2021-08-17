@@ -4,7 +4,7 @@ var data;
 var paused;
 var intervalId;
 var column_count = 2;
-var column_width = 90;
+var column_width = 80;
 var column_container = document.getElementById('column_container');
 let root = document.documentElement;
 
@@ -64,7 +64,6 @@ function redraw() {
   for (var i = 0; i < window.column_count; i++) {
     column_container.appendChild(createElement('div', {'class':'column'}));
   }
-
   for (i=0; i < window.index; i++){
     getShortestColumn().appendChild(createCard(window.data[i]));
   }
@@ -118,8 +117,9 @@ function createCard(data) {
     artists[i] = artists[i].substring(7);
   }
   if (artists.length == 1) {
-    artist.innerHTML = '&nbsp;'+artists;
-    artist.style.cursor='pointer';
+    artist.innerHTML = artists;
+    artist.style.cursor = 'pointer';
+    artist.style.paddingLeft = '20px';
     artist.addEventListener('click', function(e) {
       document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
       start();
