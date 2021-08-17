@@ -5,11 +5,57 @@
 }
 body {
   font-family: 'Josefin Sans', sans-serif;
-  padding: 0;
+  margin: 0;
   background-color: black;
   color: white;
   user-select: none;
 }
+
+#settings {
+  position: relative;
+  background-color: #2b394f;
+  margin: 0;
+  padding: 10px;
+}
+input[type="text"]
+{
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 16px;
+}
+.custom-input {
+  position: relative;
+}
+.custom-input input {
+  border: none;
+  appearance: none;
+  background-color: white;
+  padding: 8px;
+  border-radius: 10px;
+  outline: none;
+}
+.placeholder {
+  position: absolute;
+  color: white;
+  background-color: #555;
+  top: -5px;
+  left: 10px;
+  padding: 5px;
+  border-radius: 8px;
+  transform-origin: top;
+  box-shadow: 0 2px 5px 0 black;
+  transition:
+    transform var(--animation),
+    background-color var(--animation);
+}
+.custom-input input:valid + .placeholder,
+.custom-input input:focus + .placeholder {
+  transform: perspective(1cm) rotateX(45deg) translate(-3px,-25px);
+  font-size: 20px;
+  background-color: #777;
+  box-shadow: 0 2px 5px -2px black;
+}
+
+
 
 #column_container {
   display: flex;
@@ -28,7 +74,7 @@ body {
   width: 100%;
   margin: 1vw;
   transition: transform var(--animation);
-  box-shadow: 0px 10px 30px 0px black;
+  box-shadow: 0 10px 30px 0 black;
 }
 .card:hover {
   transform: scale(1.05) perspective(7cm) rotateX(2deg);
@@ -172,8 +218,4 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: navy;
-}
-
-#tags {
-  width: 90vw;
 }
