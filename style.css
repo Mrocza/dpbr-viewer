@@ -16,9 +16,13 @@ body {
   background-color: #2b394f;
   margin: 0;
   padding: 10px;
+  padding-top: 50px;
 }
-input[type="text"]
-{
+input {
+  position: relative;
+  z-index: 1;
+}
+input[type="text"] {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 16px;
 }
@@ -37,22 +41,29 @@ input[type="text"]
   position: absolute;
   color: white;
   background-color: #555;
-  top: -5px;
-  left: 10px;
-  padding: 5px;
+  background-position: 1px 8px;
+  background-size: 18px;
+  background-repeat: no-repeat;
+  margin: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  top: -2px;
+  left: 14px;
   border-radius: 8px;
-  transform-origin: top;
   box-shadow: 0 2px 5px 0 black;
+  z-index: 2;
   transition:
-    transform var(--animation),
-    background-color var(--animation);
+    top var(--animation-speed) cubic-bezier(0, 3.55, 1, 2.29),
+    background-color var(--animation),
+    z-index calc(var(--animation-speed)*0.8) step-end;
 }
 .custom-input input:valid + .placeholder,
 .custom-input input:focus + .placeholder {
-  transform: perspective(40px) rotateX(45deg) translateY(-25px) translateX(-3px) translateZ(-5px);
-  font-size: 20px;
-  background-color: #777;
-  box-shadow: 0 2px 5px -2px black;
+  top: -14px;
+  z-index: 0;
+  background-color: #999;
 }
 
 
@@ -77,14 +88,14 @@ input[type="text"]
   box-shadow: 0 10px 30px 0 black;
 }
 .card:hover {
-  transform: translateZ(15px) perspective(250px) rotateX(2deg);
+  transform: perspective(250px) translateZ(15px) rotateX(2deg);
   z-index: 99;
 }
 .card.long:hover {
-  transform: translateZ(15px) perspective(2000px) rotateX(1.5deg);
+  transform: perspective(2000px) translateZ(15px) rotateX(1.5deg);
 }
 .card.longer:hover {
-  transform: translateZ(15px) perspective(2800px) rotateX(0.1deg);
+  transform: perspective(2800px) translateZ(15px) rotateX(0.1deg);
 }
 
 .content {
@@ -193,6 +204,7 @@ input[type="text"]
 }
 .floatinfo {
   display: inline-block;
+  font-size: 12px;
   margin: 2px;
   color: black;
   background-color: white;
@@ -218,4 +230,25 @@ input[type="text"]
 }
 ::-webkit-scrollbar-thumb:hover {
   background: navy;
+}
+
+#fullscreen_container {
+  position: fixed;
+  display: none;
+  backdrop-filter: blur(20px);
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 5;
+}
+
+#fullscreen {
+  position: relative;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }

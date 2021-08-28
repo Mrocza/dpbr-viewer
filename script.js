@@ -1,4 +1,4 @@
-var page;
+var page = 1;
 var index;
 var data;
 var paused;
@@ -12,7 +12,6 @@ let root = document.documentElement;
 
 document.getElementById('tags').addEventListener("keyup", function(event) {
   if (event.keyCode === 13) start();
-  if (event.keyCode === 188) start();
 });
 document.getElementById('column_width').addEventListener('input', function() {
   window.column_width = this.value;
@@ -23,6 +22,13 @@ document.getElementById('column_count').addEventListener('input', function() {
   root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
   redraw();
 });
+document.getElementById('fullscreen_container').addEventListener('click', function() {
+  this.style.display='none';
+  clearInterval(window.slideshowID);
+  window.slideshowID = null;
+});
+
+
 
 function start() {
   window.page = 1;
@@ -34,7 +40,7 @@ function start() {
   for (var i = 0; i < window.column_count; i++) {
     column_container.appendChild(createElement('div', {'class':'column'}));
   }
-  window.tags = document.getElementById('tags').value.replace(/,\s*$/, "");;
+  window.tags = document.getElementById('tags').value.replace(/,\s*$/, "");
   window.intervalId = window.setInterval(renderimage, 100);
 }
 
@@ -67,6 +73,21 @@ function redraw() {
   for (i=0; i < window.index; i++){
     getShortestColumn().appendChild(createCard(window.data[i]));
   }
+}
+
+slideshowID = null;
+function showFullscreen(inde=null) {
+  if(inde) fullscreen_index = parseInt(inde)
+  console.log(inde);
+  console.log(window.slideshowID);
+  var fullscreen_container = document.getElementById('fullscreen_container')
+  fullscreen_container.style.display = 'block';
+  var fscr = document.getElementById('fullscreen')
+  fscr.src = window.data[fullscreen_index].representations.tall;
+
+  fullscreen_index++
+  if(!window.slideshowID)
+    window.slideshowID = setInterval(showFullscreen, 5000);
 }
 
 
@@ -128,7 +149,7 @@ function createCard(data) {
   }
   if (artists.length > 1) {
     artistList = createElement('div', {'class':'artist-list'})
-    for (var i = 0; i < artists.length && i < 50; i++) {
+    for (var i = 0; i < artists.length && i < 100; i++) {
       listItem = createElement('div', {'class':'floatinfo'});
       listItem.innerHTML = artists[i];
       listItem.addEventListener('click', function(e) {
@@ -172,6 +193,7 @@ function createCard(data) {
         'id': 'p'+index
       });
       content.appendChild(preview);
+
       art = createElement('img', {
         'class': 'art',
         'src': data.representations.tall,
@@ -181,6 +203,9 @@ function createCard(data) {
       art.addEventListener('load', function(e){
         // Remove preview image when main content is loaded
         document.getElementById('p'+e.target.id.substring(1)).remove();
+      });
+      art.addEventListener('click', function(e){
+        showFullscreen(e.target.id.substring(1))
       });
       content.appendChild(art);
       break;
