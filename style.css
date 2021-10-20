@@ -1,7 +1,7 @@
 :root {
   --column-width: 40vw;
   --animation-speed: 200ms;
-  --animation: var(--animation-speed) cubic-bezier(0,0,0,1.5);
+  --animation: var(--animation-speed) cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 body {
   font-family: 'Josefin Sans', sans-serif;
@@ -9,6 +9,11 @@ body {
   background-color: black;
   color: white;
   user-select: none;
+}
+@keyframes loading-pulse {
+  0%   { background-color: #090913; }
+  50%  { background-color: #121226; }
+  100% { background-color: #090913; }
 }
 
 #settings {
@@ -105,6 +110,9 @@ input[type="text"] {
   border-radius: 8px;
   overflow: hidden;
   background-color: #090913;
+  animation-name: loading-pulse;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
   box-shadow: 0px 0px 15px 0px black;
 }
 .content:before {

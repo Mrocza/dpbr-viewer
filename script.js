@@ -5,29 +5,21 @@ var paused;
 var intervalId;
 var column_count = 2;
 var column_width = 80;
-var column_container = document.getElementById('column_container');
 let root = document.documentElement;
 
-// derekireba
+// artist:derekireba
+// artist:holivi
 
-document.getElementById('tags').addEventListener("keyup", function(event) {
-  if (event.keyCode === 13) start();
-});
-document.getElementById('column_width').addEventListener('input', function() {
+$('#tags').on('change', start);
+$('#column_width').on('input', function() {
   window.column_width = this.value;
   root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
 });
-document.getElementById('column_count').addEventListener('input', function() {
+$('#column_count').on('input', function() {
   window.column_count = this.value;
   root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
   redraw();
 });
-document.getElementById('fullscreen_container').addEventListener('click', function() {
-  this.style.display='none';
-  clearInterval(window.slideshowID);
-  window.slideshowID = null;
-});
-
 
 
 function start() {
@@ -36,11 +28,11 @@ function start() {
   window.data = null;
   window.paused = false;
   if (window.intervalId) clearInterval(window.intervalId);
-  column_container.innerHTML = '';
+  $('#column_container').empty();
   for (var i = 0; i < window.column_count; i++) {
-    column_container.appendChild(createElement('div', {'class':'column'}));
+    $('<div>', {'class':'column'}).appendTo('#column_container');
   }
-  window.tags = document.getElementById('tags').value.replace(/,\s*$/, "");
+  window.tags = $( '#tags' ).val().replace(/,\s*$/, "");
   window.intervalId = window.setInterval(renderimage, 100);
 }
 
@@ -49,7 +41,7 @@ function getdata() {
   url.searchParams.set('per_page', '50');
   url.searchParams.set('page', window.page);
   url.searchParams.set('q', window.tags);
-  url.searchParams.set('filter_id', document.getElementById('filter_id').value); // all under 56027
+  url.searchParams.set('filter_id', $('#filter_id').val()); // all under 56027
   url.searchParams.set('sf', 'score');
   $.getJSON(url.href, function(APIreply) {
     if (APIreply.images.length == 0) return;
@@ -66,36 +58,21 @@ function getdata() {
 }
 
 function redraw() {
-  column_container.innerHTML = '';
+  $('#column_container').empty();
   for (var i = 0; i < window.column_count; i++) {
-    column_container.appendChild(createElement('div', {'class':'column'}));
+    $('<div>', {'class':'column'}).appendTo('#column_container');
   }
   for (i=0; i < window.index; i++){
     getShortestColumn().appendChild(createCard(window.data[i]));
   }
 }
 
-slideshowID = null;
-function showFullscreen(inde=null) {
-  if(inde) fullscreen_index = parseInt(inde)
-  console.log(inde);
-  console.log(window.slideshowID);
-  var fullscreen_container = document.getElementById('fullscreen_container')
-  fullscreen_container.style.display = 'block';
-  var fscr = document.getElementById('fullscreen')
-  fscr.src = window.data[fullscreen_index].representations.tall;
-
-  fullscreen_index++
-  if(!window.slideshowID)
-    window.slideshowID = setInterval(showFullscreen, 5000);
-}
-
 
 function renderimage() {
   if (window.paused) return;
 
-  let distToBottom = document.body.offsetHeight - window.scrollY;
-  if (distToBottom > window.innerHeight*10) return;
+  let distToBottom = getHeightOfChildren(getShortestColumn()) - window.scrollY;
+  if (distToBottom > window.innerHeight) return;
 
   if (window.data == null || window.data[index] == undefined) {
     getdata();
@@ -204,9 +181,6 @@ function createCard(data) {
         // Remove preview image when main content is loaded
         document.getElementById('p'+e.target.id.substring(1)).remove();
       });
-      art.addEventListener('click', function(e){
-        showFullscreen(e.target.id.substring(1))
-      });
       content.appendChild(art);
       break;
     case 'mp4':
@@ -229,12 +203,8 @@ function createCard(data) {
   return card;
 }
 
-function isArtist(tag) {
-  return tag.includes('artist:');
-}
-function isNotArtist(tag) {
-  return !tag.includes('artist:');
-}
+function isArtist(tag) { return tag.includes('artist:'); }
+function isNotArtist(tag) { return !tag.includes('artist:'); }
 function formatNumber(num) {
   if (num < 1000) return num;
   if (num < 10000) return Math.round(num/100)/10+'k';
@@ -248,18 +218,13 @@ function createElement(element, attributes = null) {
   for (a in attributes) output.setAttribute(a, attributes[a]);
   return output;
 }
-function pageScroll() {
-  setTimeout(function() {window.scrollBy(0,1);}, 2000)
-}
+
 function getShortestColumn() {
   var columns = document.getElementsByClassName('column');
   var output;
   var minHeight;
   for (i=0; i < columns.length; i++) {
-    var currentHeight = 0;
-    for (j = 0; j < columns[i].children.length; j++) {
-      currentHeight += columns[i].children[j].offsetHeight;
-    }
+    var currentHeight = getHeightOfChildren(columns[i]);
     if (minHeight == undefined) minHeight = currentHeight
     if (currentHeight <= minHeight) {
       minHeight = currentHeight;
@@ -267,4 +232,12 @@ function getShortestColumn() {
     }
   }
   return output;
+}
+
+function getHeightOfChildren(element) {
+  var currentHeight = 0;
+  for (j = 0; j < element.children.length; j++) {
+    currentHeight += element.children[j].offsetHeight;
+  }
+  return currentHeight;
 }
