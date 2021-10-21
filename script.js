@@ -37,20 +37,16 @@ function start() {
 }
 
 function getdata() {
-  var url = new URL('https://derpibooru.org/api/v1/json/search/images');
-  url.searchParams.set('per_page', '50');
-  url.searchParams.set('page', window.page);
-  url.searchParams.set('q', window.tags);
-  url.searchParams.set('filter_id', $('#filter_id').val()); // all under 56027
-  url.searchParams.set('sf', 'score');
-  $.getJSON(url.href, function(APIreply) {
+  $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
+    'per_page': '50',
+    'page': window.page,
+    'q': window.tags,
+    'filter_id': $('#filter_id').val(),
+    'sf': 'score'
+  }).done(function(APIreply) {
     if (APIreply.images.length == 0) return;
-    if (window.data == null) {
-      window.data = APIreply.images;
-    }
-    else {
-      window.data = window.data.concat(APIreply.images)
-    }
+    if (window.data == null)  window.data = APIreply.images;
+    else window.data = window.data.concat(APIreply.images);
     console.log(APIreply)
     window.page++
     window.paused = false;
@@ -84,30 +80,30 @@ function renderimage() {
 }
 
 function createCard(data) {
-  let card = createElement('div', {'class':'card'})
+  var card = createElement('div', {'class':'card'})
   if (data.aspect_ratio < .5) card.classList.add('long');
   if (data.aspect_ratio < .1) card.classList.add('longer');
 
   // Building infobox
-  let infobox = createElement('div', {'class':'infobox'});
-  let groupLeft = createElement('div');
-  infobox.appendChild(groupLeft);
-  let groupCenter = createElement('div');
-  infobox.appendChild(groupCenter);
-  let groupRight = createElement('div');
-  infobox.appendChild(groupRight);
+  var infobox = createElement('div', {'class':'infobox'});
+  card.appendChild(infobox);
 
-  let score = createElement('div', {'class':'textinfo score'});
-  groupLeft.appendChild(score);
-  score.innerHTML = formatNumber(data.score);
+  var groupLeft = $('<div>').appendTo(infobox);
+  $('<div>', {
+    html: formatNumber(data.score),
+    'class':'textinfo score'
+  }).appendTo(groupLeft);
 
-  let link = createElement('a', {
+  var groupCenter = $('<div>').appendTo(infobox);
+  $('<a>', {
     'class': 'textinfo link',
     'href': 'https://derpibooru.org/images/'+data.id,
     'target': '_blank',
     'rel':'noopener noreferrer'
-  });
-  groupCenter.appendChild(link);
+  }).appendTo(groupCenter);
+
+  var groupRight = createElement('div');
+  infobox.appendChild(groupRight);
 
   let artist = createElement('div', {'class':'textinfo artist dropdown'});
   var artists = data.tags.filter(isArtist);
@@ -139,78 +135,56 @@ function createCard(data) {
     groupRight.appendChild(artist);
   }
 
-  let tag = createElement('div', {'class':'textinfo tag dropdown'});
+  var tag = $('<div>', {'class':'textinfo tag dropdown'}).appendTo(groupRight);
+  var tagList = $('<div>', {'class':'tag-list'}).appendTo(tag);
   var tags = data.tags.filter(isNotArtist);
-  tagList = createElement('div', {'class':'tag-list'})
   for (var i = 0; i < tags.length && i < 50; i++) {
-    listItem = createElement('div', {'class':'floatinfo'});
-    listItem.innerHTML = tags[i];
-    listItem.addEventListener('click', function(e) {
-      document.getElementById('tags').value = e.target.innerHTML;
+    $('<div>', {
+      html: tags[i],
+      'class': 'floatinfo'
+    }).on('click', function(e) {
+      $('#tags').val(e.target.innerHTML);
       start();
-    });
-    tagList.appendChild(listItem);
+    }).appendTo(tagList);
   }
-  tag.appendChild(tagList);
-  groupRight.appendChild(tag);
-
 
 
   // Building content
-  let content = createElement('div', {'class': 'content'});
-  content.style.height = 'calc(var(--column-width)/'+data.aspect_ratio+')'
-  switch (data.representations.tall.split('.').pop()) {
+  var content = $('<div>', {'class': 'content'}).appendTo(card);
+  content.css('padding-bottom', 100/data.aspect_ratio+'%')
+  switch (data.format) {
+    case 'svg':
     case 'png':
     case 'jpg':
     case 'gif':
-      preview = createElement('img', {
-        'class': 'preview',
-        'src': data.representations.thumb_tiny,
-        'loading': 'eager',
-        'id': 'p'+index
-      });
-      content.appendChild(preview);
-
-      art = createElement('img', {
+      $('<img>', {
         'class': 'art',
-        'src': data.representations.tall,
+        'src': data.representations.medium,
         'loading': 'lazy',
-        'id': 'a'+index,
-      });
-      art.addEventListener('load', function(e){
-        // Remove preview image when main content is loaded
-        document.getElementById('p'+e.target.id.substring(1)).remove();
-      });
-      content.appendChild(art);
+      }).appendTo(content);
       break;
     case 'mp4':
     case 'webm':
-      art = createElement('video', {
+      $('<video>', {
         'class': 'art',
-        'src': data.representations.tall,
-        'id': 'a'+index,
-        'autoplay':'',
-        'muted':'',
-        'loop':''
-      });
-      content.appendChild(art);
+        'src': data.representations.medium,
+      }).appendTo(content);
       break;
     default:
-      console.log('Unknown format on '+data.id);
+      console.log('Unknown format "'+data.format+'" on ' + data.id);
   }
-  card.appendChild(infobox);
-  card.appendChild(content);
+
   return card;
 }
 
 function isArtist(tag) { return tag.includes('artist:'); }
 function isNotArtist(tag) { return !tag.includes('artist:'); }
 function formatNumber(num) {
-  if (num < 1000) return num;
-  if (num < 10000) return Math.round(num/100)/10+'k';
-  if (num < 1000000) return Math.round(num/1000)+'k';
-  if (num < 10000000) return Math.round(num/100000)/10+'M';
-  Math.round(num/1000000)+'M';
+  if (num < -1e3) return (num/1e3).toFixed(1)+'k';
+  if (num <  1e3) return num;
+  if (num <  1e4) return (num/1e3).toFixed(1)+'k';
+  if (num <  1e6) return (num/1e3).toFixed(0)+'k';
+  if (num <  1e7) return (num/1e6).toFixed(1)+'M';
 }
 function createElement(element, attributes = null) {
   let output = document.createElement(element);

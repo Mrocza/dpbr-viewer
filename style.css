@@ -131,20 +131,9 @@ input[type="text"] {
 .card:hover .content:before {
   transform: scale(10) rotate(45deg) translateY(-52%);
 }
-.preview {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  image-rendering: pixelated;
-}
+
 .art {
   position: absolute;
-  top: 0;
-  bottom: 0;
   display: block;
   width: 100%;
   height: 100%;
