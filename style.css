@@ -76,6 +76,7 @@ input[type="text"] {
 #column_container {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   margin-left: 5vw;
   margin-right: 5vw;
 }
@@ -83,7 +84,6 @@ input[type="text"] {
   width: var(--column-width);
   margin: .5vw;
 }
-
 .card {
   position: relative;
   display: block;

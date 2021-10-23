@@ -59,38 +59,35 @@ function redraw() {
     $('<div>', {'class':'column'}).appendTo('#column_container');
   }
   for (i=0; i < window.index; i++){
-    getShortestColumn().appendChild(createCard(window.data[i]));
+    createCard(window.data[i]).appendTo(getShortestColumn());
   }
 }
 
 
 function renderimage() {
   if (window.paused) return;
-
-  let distToBottom = getHeightOfChildren(getShortestColumn()) - window.scrollY;
-  if (distToBottom > window.innerHeight) return;
+  if ($('html').height()- $(window).scrollTop() > 3*$(window).height()) return;
 
   if (window.data == null || window.data[index] == undefined) {
     getdata();
     window.paused = true;
     return;
   }
-  getShortestColumn().appendChild(createCard(window.data[index]));
+  createCard(window.data[index]).appendTo(getShortestColumn())
   window.index++;
 }
 
 function createCard(data) {
-  var card = createElement('div', {'class':'card'})
+  var card = $('<div>', {'class':'card'})
   if (data.aspect_ratio < .5) card.classList.add('long');
   if (data.aspect_ratio < .1) card.classList.add('longer');
 
   // Building infobox
-  var infobox = createElement('div', {'class':'infobox'});
-  card.appendChild(infobox);
+  var infobox = $('<div>', {'class':'infobox'}).appendTo(card);
 
   var groupLeft = $('<div>').appendTo(infobox);
   $('<div>', {
-    html: formatNumber(data.score),
+    'html': formatNumber(data.score),
     'class':'textinfo score'
   }).appendTo(groupLeft);
 
@@ -102,37 +99,36 @@ function createCard(data) {
     'rel':'noopener noreferrer'
   }).appendTo(groupCenter);
 
-  var groupRight = createElement('div');
-  infobox.appendChild(groupRight);
-
-  let artist = createElement('div', {'class':'textinfo artist dropdown'});
+  var groupRight = $('<div>').appendTo(infobox);
   var artists = data.tags.filter(isArtist);
   for (var i = 0; i < artists.length; i++) {
     artists[i] = artists[i].substring(7);
   }
   if (artists.length == 1) {
-    artist.innerHTML = artists;
-    artist.style.cursor = 'pointer';
-    artist.style.paddingLeft = '20px';
-    artist.addEventListener('click', function(e) {
+    $('<div>', {
+      'html': artists,
+      'class':'textinfo artist dropdown',
+      'css': {
+        'cursor': 'pointer',
+        'padding-left': '20px'
+      }
+    }).on('click', function(e) {
       document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
       start();
-    });
-    groupRight.appendChild(artist);
+    }).appendTo(groupRight);
   }
   if (artists.length > 1) {
-    artistList = createElement('div', {'class':'artist-list'})
+    artist = $('<div>', {'class':'textinfo artist dropdown'}).appendTo(groupRight);
+    artistList = $('<div>', {'class':'artist-list'}).appendTo(artist);
     for (var i = 0; i < artists.length && i < 100; i++) {
-      listItem = createElement('div', {'class':'floatinfo'});
-      listItem.innerHTML = artists[i];
-      listItem.addEventListener('click', function(e) {
+      listItem = $('<div>', {
+        'html': artists[i],
+        'class': 'floatinfo'
+      }).on('click', function(e) {
         document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
         start();
-      });
-      artistList.appendChild(listItem);
+      }).appendTo(artistList);
     }
-    artist.appendChild(artistList);
-    groupRight.appendChild(artist);
   }
 
   var tag = $('<div>', {'class':'textinfo tag dropdown'}).appendTo(groupRight);
@@ -186,32 +182,15 @@ function formatNumber(num) {
   if (num <  1e6) return (num/1e3).toFixed(0)+'k';
   if (num <  1e7) return (num/1e6).toFixed(1)+'M';
 }
-function createElement(element, attributes = null) {
-  let output = document.createElement(element);
-  if (attributes == null) return output;
-  for (a in attributes) output.setAttribute(a, attributes[a]);
-  return output;
-}
 
 function getShortestColumn() {
-  var columns = document.getElementsByClassName('column');
-  var output;
-  var minHeight;
-  for (i=0; i < columns.length; i++) {
-    var currentHeight = getHeightOfChildren(columns[i]);
-    if (minHeight == undefined) minHeight = currentHeight
-    if (currentHeight <= minHeight) {
-      minHeight = currentHeight;
-      output = columns[i];
+  var output
+  var currentHeight = Number.MAX_SAFE_INTEGER
+  $('.column').each( function() {
+    if ($(this).height() < currentHeight) {
+      currentHeight = $(this).height();
+      output = $(this);
     }
-  }
-  return output;
-}
-
-function getHeightOfChildren(element) {
-  var currentHeight = 0;
-  for (j = 0; j < element.children.length; j++) {
-    currentHeight += element.children[j].offsetHeight;
-  }
-  return currentHeight;
+  });
+  return output
 }
