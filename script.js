@@ -79,8 +79,8 @@ function renderimage() {
 
 function createCard(data) {
   var card = $('<div>', {'class':'card'})
-  if (data.aspect_ratio < .5) card.classList.add('long');
-  if (data.aspect_ratio < .1) card.classList.add('longer');
+  if (data.aspect_ratio < .5) card.addClass('long');
+  if (data.aspect_ratio < .1) card.addClass('longer');
 
   // Building infobox
   var infobox = $('<div>', {'class':'infobox'}).appendTo(card);
