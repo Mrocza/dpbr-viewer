@@ -15,12 +15,6 @@ $('#column_width').on('input', function() {
   window.column_width = this.value;
   root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
 });
-$('#column_count').on('input', function() {
-  window.column_count = this.value;
-  root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
-  redraw();
-});
-
 
 function start() {
   window.page = 1;
@@ -52,17 +46,6 @@ function getdata() {
     window.paused = false;
   });
 }
-
-function redraw() {
-  $('#column_container').empty();
-  for (var i = 0; i < window.column_count; i++) {
-    $('<div>', {'class':'column'}).appendTo('#column_container');
-  }
-  for (i=0; i < window.index; i++){
-    createCard(window.data[i]).appendTo(getShortestColumn());
-  }
-}
-
 
 function renderimage() {
   if (window.paused) return;
