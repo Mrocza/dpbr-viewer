@@ -1,46 +1,75 @@
 var page = 1;
-var index;
 var data;
 var paused;
 var intervalId;
-var column_count = 2;
-var column_width = 80;
-let root = document.documentElement;
 
 // artist:derekireba
 // artist:holivi
+var screenAspectRatio = $(window).width()/$(window).height()
+if (screenAspectRatio > 1.7) {
+  $('#column_count').val(3)
+} else if (screenAspectRatio > 1) {
+  $('#column_count').val(2)
+} else {
+  $('#column_count').val(1)
+}
+$(':root').css('--column-width', $('#column_width').val()/$('#column_count').val()+'vw');
 
 $('#tags').on('change', start);
 $('#column_width').on('input', function() {
-  window.column_width = this.value;
-  root.style.setProperty('--column-width', window.column_width/window.column_count+'vw');
+  $(':root').css('--column-width', this.value/$('.column').length+'vw');
 });
 
 function start() {
+  if (window.paused) return;
   window.page = 1;
-  window.index = 0;
-  window.data = null;
-  window.paused = false;
+  window.data = [];
   if (window.intervalId) clearInterval(window.intervalId);
   $('#column_container').empty();
-  for (var i = 0; i < window.column_count; i++) {
+  for (var i = 0; i < $('#column_count').val(); i++) {
     $('<div>', {'class':'column'}).appendTo('#column_container');
   }
-  window.tags = $( '#tags' ).val().replace(/,\s*$/, "");
   window.intervalId = window.setInterval(renderimage, 100);
 }
 
 function getdata() {
+  window.paused = true;
+
+  var query = '('+ $('#tags').val() +')';
+  if (query == '()') query = '*';
+
+  var include = []
+  var exclude = []
+  if ($('#safe').prop( "checked" )) include.push('safe');
+  else exclude.push('!safe');
+  if ($('#suggestive').prop( "checked" )) include.push('suggestive');
+  else exclude.push('!suggestive');
+  if ($('#questionable').prop( "checked" )) include.push('questionable');
+  else exclude.push('!questionable');
+  if ($('#explicit').prop( "checked" )) include.push('explicit');
+  else exclude.push('!explicit');
+  if (include.length > 0) query += ' && ('+ include.join(' || ') +')';
+  if (exclude.length > 0) query += ' && ('+ exclude.join(' && ') +')';
+
+  var include = []
+  var exclude = []
+  if ($('#semi-grimdark').prop( "checked" )) include.push('semi-grimdark');
+  else exclude.push('!semi-grimdark');
+  if ($('#grimdark').prop( "checked" )) include.push('grimdark');
+  else exclude.push('!grimdark');
+  if (include.length > 0) query += ' && ('+ include.join(' || ') +')';
+  if (exclude.length > 0) query += ' && ('+ exclude.join(' && ') +')';
+  console.log(query)
+
   $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
     'per_page': '50',
     'page': window.page,
-    'q': window.tags,
-    'filter_id': $('#filter_id').val(),
+    'q': query,
+    'filter_id': 56027,
     'sf': 'score'
   }).done(function(APIreply) {
     if (APIreply.images.length == 0) return;
-    if (window.data == null)  window.data = APIreply.images;
-    else window.data = window.data.concat(APIreply.images);
+    window.data = window.data.concat(APIreply.images);
     console.log(APIreply)
     window.page++
     window.paused = false;
@@ -49,15 +78,13 @@ function getdata() {
 
 function renderimage() {
   if (window.paused) return;
-  if ($('html').height()- $(window).scrollTop() > 3*$(window).height()) return;
+  if ($('html').height()-$(window).scrollTop() > 2*$(window).height()) return;
 
-  if (window.data == null || window.data[index] == undefined) {
+  if (window.data.length == 0) {
     getdata();
-    window.paused = true;
     return;
   }
-  createCard(window.data[index]).appendTo(getShortestColumn())
-  window.index++;
+  createCard(window.data.shift()).appendTo(getShortestColumn())
 }
 
 function createCard(data) {

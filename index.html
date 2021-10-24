@@ -12,12 +12,27 @@
     <div id="settings">
       <label class="custom-input">
         <input type="text" id="tags" required>
-        <span class="placeholder">Tags</span>
+        <span class="placeholder">Search for things here</span>
       </label>
       <br />
-      <input type="range" id="column_width" min="10" max="80" value="80" step="1"><br />
-      <input type="number" id="column_count" min="1" max="10" value="2"><br />
-      <input type="text" id="filter_id" value="100073"><br/>
+      <div>
+        <label><input type="checkbox" id="safe" checked>
+          <span>safe</span></label>
+        <label><input type="checkbox" id="suggestive">
+          <span>suggestive</span></label>
+        <label><input type="checkbox" id="questionable">
+          <span>questionable</span></label>
+        <label><input type="checkbox" id="explicit">
+          <span>explicit</span></label>
+        <br />
+        <label><input type="checkbox" id="semi-grimdark">
+          <span>semi-grimdark</span></label>
+        <label><input type="checkbox" id="grimdark">
+          <span>grimdark</span></label>
+      </div>
+      <br />
+      <input type="range" id="column_width" min="10" max="85" value="85" step="1">
+      <input type="number" id="column_count" min="1" max="10" value="2">
       <button type="button" onclick="start()">Give Me!</button>
     </div>
     <div id="column_container"/>
