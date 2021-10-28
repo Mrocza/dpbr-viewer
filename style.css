@@ -34,7 +34,8 @@ input[type="text"] {
 .custom-input {
   position: relative;
 }
-.custom-input input {
+
+.custom-input input[type="text"] {
   border: none;
   appearance: none;
   background-color: white;
@@ -56,6 +57,50 @@ input[type="text"] {
 .custom-input input:focus + .placeholder {
   display: none;
 }
+
+
+.filterbutton {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  margin-right: 0;
+  margin-left: 300px;
+  background-color: red;
+}
+.filters {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 150px;
+  background-color: #2b396f;
+  border-radius: 4px;
+  padding: 5px;
+  z-index: 5;
+}
+.custom-input input[type="checkbox"] {
+  display: none;
+}
+.custom-input .icon {
+  position: relative;
+  top: 20px;
+  display: inline-block;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  z-index: 5;
+}
+.custom-input:hover .icon {
+  background-color: #ccc;
+}
+.custom-input input:checked ~ .icon {
+  background-color: #2196F3;
+}
+
+
+
+
+
 
 #column_container {
   display: flex;
@@ -168,16 +213,17 @@ input[type="text"] {
   position: absolute;
   right: 0;
   top: 0;
-  width: var(--column-width);
   text-align: right;
   opacity: 0;
   transition:
     top var(--animation),
     opacity var(--animation),
     pointer-events var(--animation-speed) step-end 500ms;
-
 }
-.artist > * { right: -24px; }
+.artist > * {
+  right: -24px;
+  width: var(--column-width);
+}
 .dropdown:hover * {
   pointer-events: auto;
   opacity: 1;

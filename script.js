@@ -38,28 +38,15 @@ function getdata() {
   var query = '('+ $('#tags').val() +')';
   if (query == '()') query = '*';
 
-  var include = []
   var exclude = []
-  if ($('#safe').prop( "checked" )) include.push('safe');
-  else exclude.push('!safe');
-  if ($('#suggestive').prop( "checked" )) include.push('suggestive');
-  else exclude.push('!suggestive');
-  if ($('#questionable').prop( "checked" )) include.push('questionable');
-  else exclude.push('!questionable');
-  if ($('#explicit').prop( "checked" )) include.push('explicit');
-  else exclude.push('!explicit');
-  if (include.length > 0) query += ' && ('+ include.join(' || ') +')';
+  if (!$('#safe').prop( "checked" )) exclude.push('!safe');
+  if (!$('#suggestive').prop( "checked" )) exclude.push('!suggestive');
+  if (!$('#questionable').prop( "checked" )) exclude.push('!questionable');
+  if (!$('#explicit').prop( "checked" )) exclude.push('!explicit');
+  if (!$('#semi-grimdark').prop( "checked" )) exclude.push('!semi-grimdark');
+  if (!$('#grimdark').prop( "checked" )) exclude.push('!grimdark');
+  if (!$('#grotesque').prop( "checked" )) exclude.push('!grotesque');
   if (exclude.length > 0) query += ' && ('+ exclude.join(' && ') +')';
-
-  var include = []
-  var exclude = []
-  if ($('#semi-grimdark').prop( "checked" )) include.push('semi-grimdark');
-  else exclude.push('!semi-grimdark');
-  if ($('#grimdark').prop( "checked" )) include.push('grimdark');
-  else exclude.push('!grimdark');
-  if (include.length > 0) query += ' && ('+ include.join(' || ') +')';
-  if (exclude.length > 0) query += ' && ('+ exclude.join(' && ') +')';
-  console.log(query)
 
   $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
     'per_page': '50',
@@ -68,9 +55,10 @@ function getdata() {
     'filter_id': 56027,
     'sf': 'score'
   }).done(function(APIreply) {
+    console.log(query)
+    console.log(APIreply)
     if (APIreply.images.length == 0) return;
     window.data = window.data.concat(APIreply.images);
-    console.log(APIreply)
     window.page++
     window.paused = false;
   });
@@ -165,7 +153,7 @@ function createCard(data) {
     case 'gif':
       $('<img>', {
         'class': 'art',
-        'src': data.representations.medium,
+        'src': data.representations.small,
         'loading': 'lazy',
       }).appendTo(content);
       break;
@@ -173,7 +161,7 @@ function createCard(data) {
     case 'webm':
       $('<video>', {
         'class': 'art',
-        'src': data.representations.medium,
+        'src': data.representations.small,
       }).appendTo(content);
       break;
     default:
