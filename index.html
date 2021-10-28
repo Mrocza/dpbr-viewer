@@ -10,55 +10,55 @@
   </head>
   <body>
     <div id="settings">
-      <label class="custom-input">
-        <input type="text" id="tags" required>
-        <span class="placeholder">Search for things here</span>
-      </label>
-      <br />
+      <div id="tag-text">
+        <label class="custom-input">
+          <input type="text" id="tags" required>
+          <span class="placeholder">Search for things here</span>
+        </label>
+      </div>
       <div class="filterbutton dropdown">
         <div class="filters">
           <label class="custom-input">
             <input type="checkbox" id="safe" checked>
             <span class="icon"></span>
-            <span>safe</span>
+            <span class="text">safe</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="suggestive">
             <span class="icon"></span>
-            <span>suggestive</span>
+            <span class="text">suggestive</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="questionable">
             <span class="icon"></span>
-            <span>questionable</span>
+            <span class="text">questionable</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="explicit">
             <span class="icon"></span>
-            <span>explicit</span>
+            <span class="text">explicit</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="semi-grimdark">
             <span class="icon"></span>
-            <span>semi-grimdark</span>
+            <span class="text">semi-grimdark</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="grimdark">
             <span class="icon"></span>
-            <span>grimdark</span>
+            <span class="text">grimdark</span>
           </label>
           <label class="custom-input">
             <input type="checkbox" id="grotesque">
             <span class="icon"></span>
-            <span>grotesque</span>
+            <span class="text">grotesque</span>
           </label>
         </div>
       </div>
-      <br />
-      <input type="range" id="column_width" min="10" max="85" value="85" step="1">
-      <input type="number" id="column_count" min="1" max="10" value="2">
-      <button type="button" onclick="start()">Give Me!</button>
     </div>
+    <input type="range" id="column_width" min="10" max="85" value="85" step="1">
+    <input type="number" id="column_count" min="1" max="10" value="2">
+    <button type="button" onclick="start()">Give Me!</button>
     <div id="column_container"/>
       <!-- Generated dynamically -->
     </div>

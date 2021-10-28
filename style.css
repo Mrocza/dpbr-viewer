@@ -17,12 +17,29 @@ body {
   100% { background-color: #090913; }
 }
 
+.dropdown > * {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  text-align: right;
+  opacity: 0;
+  transition: opacity 300ms;
+}
+.dropdown:hover * {
+  opacity: 1;
+}
+
 #settings {
   position: relative;
+  display: flex;
+  gap: 10px;
   background-color: #2b394f;
   margin: 0;
   padding: 10px;
 }
+
+
+
 input {
   position: relative;
   z-index: 1;
@@ -42,7 +59,6 @@ input[type="text"] {
   padding: 8px;
   border-radius: 10px;
   outline: none;
-  width: calc(100% - 20px);
 }
 .placeholder {
   display: block;
@@ -61,11 +77,10 @@ input[type="text"] {
 
 .filterbutton {
   position: relative;
-  width: 20px;
-  height: 20px;
-  margin-right: 0;
-  margin-left: 300px;
-  background-color: red;
+  background-color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
 }
 .filters {
   display: flex;
@@ -82,13 +97,17 @@ input[type="text"] {
 }
 .custom-input .icon {
   position: relative;
-  top: 20px;
+  top: 0;
   display: inline-block;
   border-radius: 4px;
   width: 20px;
   height: 20px;
   opacity: 1;
   z-index: 5;
+}
+.custom-input .text {
+  position: relative;
+  top: -5px;
 }
 .custom-input:hover .icon {
   background-color: #ccc;
@@ -203,31 +222,16 @@ input[type="text"] {
   background-image: url('artist.svg');
   padding-left: 15px;
 }
-.tag {
-  background-image: url('tag.svg');
-  padding-left: 15px;
-}
-
-.dropdown > * {
-  pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  text-align: right;
-  opacity: 0;
-  transition:
-    top var(--animation),
-    opacity var(--animation),
-    pointer-events var(--animation-speed) step-end 500ms;
-}
 .artist > * {
   right: -24px;
   width: var(--column-width);
 }
-.dropdown:hover * {
-  pointer-events: auto;
-  opacity: 1;
-  top: 100%;
+.tag {
+  background-image: url('tag.svg');
+  padding-left: 15px;
+}
+.tag > * {
+  width: var(--column-width);
 }
 .floatinfo {
   display: inline-block;
