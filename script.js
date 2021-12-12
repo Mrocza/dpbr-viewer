@@ -20,8 +20,13 @@ $('#column_width').on('input', function() {
   $(':root').css('--column-width', this.value/$('.column').length+'vw');
 });
 
+$('#column_container').on('click', function(e) {
+  console.log($(e.target))
+  console.log($(e.target).parent().data())
+});
+
 function start() {
-  if (window.paused) return;
+  window.paused = false;
   window.page = 1;
   window.data = [];
   if (window.intervalId) clearInterval(window.intervalId);
@@ -58,10 +63,20 @@ function getdata() {
     console.log(query)
     console.log(APIreply)
     if (APIreply.images.length == 0) return;
-    window.data = window.data.concat(APIreply.images);
+
+    for(var image of APIreply.images) {
+      window.data.push({
+        'id': image.id,
+        'format': image.format,
+        'aspectRatio': image.aspect_ratio,
+        'preview': image.representations.tall,
+        'full': image.representations.full,
+      })
+    }
     window.page++
     window.paused = false;
-  });
+  })
+
 }
 
 function renderimage() {
@@ -76,76 +91,13 @@ function renderimage() {
 }
 
 function createCard(data) {
-  var card = $('<div>', {'class':'card'})
-  if (data.aspect_ratio < .5) card.addClass('long');
-  if (data.aspect_ratio < .1) card.addClass('longer');
+  var card = $('<div>', {
+    'class': 'card',
+    'css': { 'padding-bottom': 100/data.aspectRatio+'%' }
+  }).data(data)
+  if (data.aspectRatio < .5) card.addClass('long');
+  if (data.aspectRatio < .1) card.addClass('longer');
 
-  // Building infobox
-  var infobox = $('<div>', {'class':'infobox'}).appendTo(card);
-
-  var groupLeft = $('<div>').appendTo(infobox);
-  $('<div>', {
-    'html': formatNumber(data.score),
-    'class':'textinfo score'
-  }).appendTo(groupLeft);
-
-  var groupCenter = $('<div>').appendTo(infobox);
-  $('<a>', {
-    'class': 'textinfo link',
-    'href': 'https://derpibooru.org/images/'+data.id,
-    'target': '_blank',
-    'rel':'noopener noreferrer'
-  }).appendTo(groupCenter);
-
-  var groupRight = $('<div>').appendTo(infobox);
-  var artists = data.tags.filter(isArtist);
-  for (var i = 0; i < artists.length; i++) {
-    artists[i] = artists[i].substring(7);
-  }
-  if (artists.length == 1) {
-    $('<div>', {
-      'html': artists,
-      'class':'textinfo artist dropdown',
-      'css': {
-        'cursor': 'pointer',
-        'padding-left': '20px'
-      }
-    }).on('click', function(e) {
-      document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
-      start();
-    }).appendTo(groupRight);
-  }
-  if (artists.length > 1) {
-    artist = $('<div>', {'class':'textinfo artist dropdown'}).appendTo(groupRight);
-    artistList = $('<div>', {'class':'artist-list'}).appendTo(artist);
-    for (var i = 0; i < artists.length && i < 100; i++) {
-      listItem = $('<div>', {
-        'html': artists[i],
-        'class': 'floatinfo'
-      }).on('click', function(e) {
-        document.getElementById('tags').value = 'artist:'+e.target.innerHTML;
-        start();
-      }).appendTo(artistList);
-    }
-  }
-
-  var tag = $('<div>', {'class':'textinfo tag dropdown'}).appendTo(groupRight);
-  var tagList = $('<div>', {'class':'tag-list'}).appendTo(tag);
-  var tags = data.tags.filter(isNotArtist);
-  for (var i = 0; i < tags.length && i < 50; i++) {
-    $('<div>', {
-      html: tags[i],
-      'class': 'floatinfo'
-    }).on('click', function(e) {
-      $('#tags').val(e.target.innerHTML);
-      start();
-    }).appendTo(tagList);
-  }
-
-
-  // Building content
-  var content = $('<div>', {'class': 'content'}).appendTo(card);
-  content.css('padding-bottom', 100/data.aspect_ratio+'%')
   switch (data.format) {
     case 'svg':
     case 'png':
@@ -153,21 +105,20 @@ function createCard(data) {
     case 'gif':
       $('<img>', {
         'class': 'art',
-        'src': data.representations.small,
+        'src': data.preview,
         'loading': 'lazy',
-      }).appendTo(content);
+      }).data(data).appendTo(card);
       break;
     case 'mp4':
     case 'webm':
       $('<video>', {
         'class': 'art',
-        'src': data.representations.small,
-      }).appendTo(content);
+        'src': data.preview,
+      }).data(data).appendTo(card);
       break;
     default:
       console.log('Unknown format "'+data.format+'" on ' + data.id);
   }
-
   return card;
 }
 
@@ -179,6 +130,20 @@ function formatNumber(num) {
   if (num <  1e4) return (num/1e3).toFixed(1)+'k';
   if (num <  1e6) return (num/1e3).toFixed(0)+'k';
   if (num <  1e7) return (num/1e6).toFixed(1)+'M';
+}
+function formatTime(dateString) {
+  var relativeTime = new Date( new Date() - new Date(dateString) );
+  if (relativeTime.getYear() == 71) return `1 year ago`;
+  if (relativeTime.getYear() > 71) return `${relativeTime.getYear()-70} years ago`;
+  if (relativeTime.getMonth() == 1) return `1 month ago`;
+  if (relativeTime.getMonth() > 1) return `${relativeTime.getMonth()} months ago`;
+  if (relativeTime.getDate() == 2) return `1 day ago`;
+  if (relativeTime.getDate() > 2) return `${relativeTime.getDate()-1} days ago`;
+  if (relativeTime.getHours() == 1) return `1 hour ago`;
+  if (relativeTime.getHours() > 1) return `${relativeTime.getHours()} hours ago`;
+  if (relativeTime.getMinutes() == 1) return `1 minute ago`;
+  if (relativeTime.getMinutes() > 1) return `${relativeTime.getMinutes()} minutes ago`;
+  return `just now`;
 }
 
 function getShortestColumn() {
