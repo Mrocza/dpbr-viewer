@@ -149,7 +149,7 @@ input[type="text"] {
   animation-iteration-count: infinite;
   box-shadow: 0px 0px 15px 0px black;
 }
-.card:hover {
+/* .card:hover {
   transform: perspective(250px) translateZ(15px) rotateX(2deg);
   z-index: 99;
 }
@@ -158,7 +158,7 @@ input[type="text"] {
 }
 .card.longer:hover {
   transform: perspective(2800px) translateZ(15px) rotateX(0.1deg);
-}
+} */
 
 .art {
   position: absolute;
@@ -182,7 +182,7 @@ input[type="text"] {
   background: navy;
 }
 
-.overlay {
+#overlay {
   position: fixed;
   display: none;
   backdrop-filter: blur(20px);
@@ -190,8 +190,16 @@ input[type="text"] {
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 50;
+}
+#overlay .art {
+  object-fit: contain;
+}
+#overlay button {
+  position: absolute;
   z-index: 5;
 }
-.overlay .art {
-  object-fit: contain;
+#close {
+  top: 10px;
+  right: 10px;
 }

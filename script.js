@@ -21,8 +21,12 @@ $('#column_width').on('input', function() {
 });
 
 $('#column_container').on('click', function(e) {
-  console.log($(e.target))
   console.log($(e.target).parent().data())
+  $('#overlay').append($(e.target).clone()).css('display','block')
+});
+$('#close').on('click', function(e) {
+  $('#overlay').css('display','none')
+  $('#overlay .art').remove()
 });
 
 function start() {
