@@ -1,4 +1,5 @@
 var page = 1;
+var index = 0;
 var data;
 var paused;
 var intervalId;
@@ -21,12 +22,18 @@ $('#column_width').on('input', function() {
 });
 
 $('#column_container').on('click', function(e) {
-  console.log($(e.target).parent().data())
+  console.log($(e.target).parent().attr('id'))
   $('#overlay').append($(e.target).clone()).css('display','block')
 });
 $('#close').on('click', function(e) {
   $('#overlay').css('display','none')
   $('#overlay .art').remove()
+});
+$(window).on('navigate', function (e, data) {
+  if (data.state.direction == 'back') {
+    $('#overlay').css('display','none')
+    $('#overlay .art').remove()
+  }
 });
 
 function start() {
@@ -87,20 +94,20 @@ function renderimage() {
   if (window.paused) return;
   if ($('html').height()-$(window).scrollTop() > 2*$(window).height()) return;
 
-  if (window.data.length == 0) {
+  if (window.data[window.index] == undefined) {
     getdata();
     return;
   }
-  createCard(window.data.shift()).appendTo(getShortestColumn())
+  createCard(window.data[window.index]).appendTo(getShortestColumn())
+  window.index++
 }
 
 function createCard(data) {
   var card = $('<div>', {
+    'id': window.index,
     'class': 'card',
     'css': { 'padding-bottom': 100/data.aspectRatio+'%' }
-  }).data(data)
-  if (data.aspectRatio < .5) card.addClass('long');
-  if (data.aspectRatio < .1) card.addClass('longer');
+  })
 
   switch (data.format) {
     case 'svg':
@@ -149,7 +156,6 @@ function formatTime(dateString) {
   if (relativeTime.getMinutes() > 1) return `${relativeTime.getMinutes()} minutes ago`;
   return `just now`;
 }
-
 function getShortestColumn() {
   var output
   var currentHeight = Number.MAX_SAFE_INTEGER
