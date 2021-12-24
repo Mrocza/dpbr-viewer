@@ -29,22 +29,18 @@ $('#close').on('click', function(e) {
   $('#overlay').css('display','none')
   $('#overlay .art').remove()
 });
-$(window).on('navigate', function (e, data) {
-  if (data.state.direction == 'back') {
-    $('#overlay').css('display','none')
-    $('#overlay .art').remove()
-  }
-});
 
 function start() {
   window.paused = false;
   window.page = 1;
+  window.index = 0;
   window.data = [];
-  if (window.intervalId) clearInterval(window.intervalId);
+
   $('#column_container').empty();
   for (var i = 0; i < $('#column_count').val(); i++) {
     $('<div>', {'class':'column'}).appendTo('#column_container');
   }
+  if (window.intervalId) clearInterval(window.intervalId);
   window.intervalId = window.setInterval(renderimage, 100);
 }
 
@@ -55,14 +51,14 @@ function getdata() {
   if (query == '()') query = '*';
 
   var exclude = []
-  if (!$('#safe').prop( "checked" )) exclude.push('!safe');
-  if (!$('#suggestive').prop( "checked" )) exclude.push('!suggestive');
-  if (!$('#questionable').prop( "checked" )) exclude.push('!questionable');
-  if (!$('#explicit').prop( "checked" )) exclude.push('!explicit');
-  if (!$('#semi-grimdark').prop( "checked" )) exclude.push('!semi-grimdark');
-  if (!$('#grimdark').prop( "checked" )) exclude.push('!grimdark');
-  if (!$('#grotesque').prop( "checked" )) exclude.push('!grotesque');
-  if (exclude.length > 0) query += ' && ('+ exclude.join(' && ') +')';
+  if (!$('#safe').prop('checked')) exclude.push('!safe');
+  if (!$('#suggestive').prop('checked')) exclude.push('!suggestive');
+  if (!$('#questionable').prop('checked')) exclude.push('!questionable');
+  if (!$('#explicit').prop('checked')) exclude.push('!explicit');
+  if (!$('#semi-grimdark').prop('checked')) exclude.push('!semi-grimdark');
+  if (!$('#grimdark').prop('checked')) exclude.push('!grimdark');
+  if (!$('#grotesque').prop('checked')) exclude.push('!grotesque');
+  if (exclude.length > 0) query += ' && ' + exclude.join(' && ');
 
   $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
     'per_page': '50',
