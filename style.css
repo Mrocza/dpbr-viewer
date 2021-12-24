@@ -54,38 +54,6 @@ input[type="text"]:focus + label {
 
 #settings-button {
   position: fixed;
-<<<<<<< HEAD
-=======
-  top: 0;
-  right: 0px;
-  width: 25px;
-  height: 25px;
-  z-index: 10;
-  transition: right 300ms;
-}
-#settings-button:checked {
-  right: 200px;
-}
-#settings {
-  position: fixed;
-  top: 0;
-  right: -200px;
-  width: 200px;
-  height: 100vw;
-  background-color: gray;
-  z-index: 10;
-  transition: right 300ms;
-}
-#settings-button:checked ~ #settings {
-  right: 0;
-}
-
-.custom-input input[type="checkbox"] {
-  display: none;
-}
-.custom-input .icon {
-  position: relative;
->>>>>>> 0244469e0d128a20822abd084ee354521aaefd04
   top: 0;
   right: 0px;
   width: 25px;
