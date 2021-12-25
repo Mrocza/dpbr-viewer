@@ -23,7 +23,7 @@ $('#column_width').on('input', function() {
 
 var overlayID = 0
 $('#column_container').on('click', function(e) {
-  window.overlayID = $(e.target).parent().attr('id')
+  window.overlayID = $(e.target).parent().prop('id')
   $('#overlay').append($(e.target).clone()).css('display','block')
 });
 $('#close').on('click', function(e) {
@@ -31,7 +31,7 @@ $('#close').on('click', function(e) {
   $('#overlay .art').remove()
 });
 $('#follow').on('click', function(e) {
-  window.open('https://derpibooru.org/images/'+window.data[window.overlayID].id, '_blank');
+  window.open('https://furbooru.org/images/'+window.data[window.overlayID].id, '_blank');
 });
 $('#next').on('click', function(e) {
   window.overlayID++
@@ -58,56 +58,6 @@ function start() {
   }
   if (window.intervalId) clearInterval(window.intervalId);
   window.intervalId = window.setInterval(renderimage, 100);
-}
-
-function getdata() {
-  window.paused = true;
-
-  var query = '('+ $('#tags').val() +')';
-  if (query == '()') query = '*';
-
-  var exclude = []
-  if (!$('#safe').prop('checked')) exclude.push('!safe');
-  if (!$('#suggestive').prop('checked')) exclude.push('!suggestive');
-  if (!$('#questionable').prop('checked')) exclude.push('!questionable');
-  if (!$('#explicit').prop('checked')) exclude.push('!explicit');
-  if (!$('#semi-grimdark').prop('checked')) exclude.push('!semi-grimdark');
-  if (!$('#grimdark').prop('checked')) exclude.push('!grimdark');
-  if (!$('#grotesque').prop('checked')) exclude.push('!grotesque');
-  if (!$('#animated').prop('checked')) exclude.push('!animated');
-  if (exclude.length > 0) query += ' && ' + exclude.join(' && ');
-
-  var range = `score.gte:${$('#min_score').val()}`
-  query += ' && ' + range;
-
-
-  var sf = $('input[name="sf"]:checked').val()
-  console.log(sf)
-
-  $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
-    'per_page': '50',
-    'page': window.page,
-    'q': query,
-    'filter_id': 56027,
-    'sf': sf
-  }).done(function(APIreply) {
-    console.log(query)
-    console.log(APIreply)
-    if (APIreply.images.length == 0) return;
-
-    for(var image of APIreply.images) {
-      window.data.push({
-        'id': image.id,
-        'format': image.format,
-        'aspectRatio': image.aspect_ratio,
-        'preview': image.representations.tall,
-        'full': image.representations.full,
-      })
-    }
-    window.page++
-    window.paused = false;
-  })
-
 }
 
 function renderimage() {
@@ -151,6 +101,52 @@ function createCard(data) {
       console.log('Unknown format "'+data.format+'" on ' + data.id);
   }
   return card;
+}
+
+function getdata() {
+  window.paused = true;
+
+  var query = $('#tags').val();
+  if (query == '') query = '*';
+
+  if (!$('#safe').prop('checked')) query += ' && !safe';
+  if (!$('#suggestive').prop('checked')) query += ' && !suggestive';
+  if (!$('#questionable').prop('checked')) query += ' && !questionable';
+  if (!$('#explicit').prop('checked')) query += ' && !explicit';
+  if (!$('#semi-grimdark').prop('checked')) query += ' && !semi-grimdark';
+  if (!$('#grimdark').prop('checked')) query += ' && !grimdark';
+  if (!$('#grotesque').prop('checked')) query += ' && !grotesque';
+  if (!$('#animated').prop('checked')) query += ' && !animated';
+
+  query += ` && score.gte:${$('#min_score').val()}`;
+
+
+  var sf = $('input[name="sf"]:checked').val()
+
+  $.getJSON('https://furbooru.org/api/v1/json/search/images', {
+    'per_page': '50',
+    'page': window.page,
+    'q': query,
+    'filter_id': 2,//56027,
+    'sf': sf
+  }).done(function(APIreply) {
+    console.log(query)
+    console.log(APIreply)
+    if (APIreply.images.length == 0) return;
+
+    for(var image of APIreply.images) {
+      window.data.push({
+        'id': image.id,
+        'format': image.format,
+        'aspectRatio': image.aspect_ratio,
+        'preview': image.representations.tall,
+        'full': image.representations.full,
+      })
+    }
+    window.page++
+    window.paused = false;
+  })
+
 }
 
 function isArtist(tag) { return tag.includes('artist:'); }

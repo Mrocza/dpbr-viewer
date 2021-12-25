@@ -25,7 +25,7 @@ body {
   height: 100px;
 }
 
-input[type="text"] {
+input[type="search"] {
   position: absolute;
   bottom: 5px;
   z-index: 1;
@@ -38,7 +38,7 @@ input[type="text"] {
   border-radius: 10px;
   outline: none;
 }
-input[type="text"] + label {
+input[type="search"] + label {
   display: block;
   position: absolute;
   bottom: 12px;
@@ -47,8 +47,8 @@ input[type="text"] + label {
   z-index: 2;
   color: gray;
 }
-input[type="text"]:valid + label,
-input[type="text"]:focus + label {
+input[type="search"]:valid + label,
+input[type="search"]:focus + label {
   display: none;
 }
 
