@@ -164,3 +164,15 @@ input[type="text"]:focus + label {
   top: 10px;
   right: 10px;
 }
+#follow{
+  top: 30px;
+  right: 10px;
+}
+#next{
+  top: 50px;
+  right: 10px;
+}
+#auto{
+  top: 90px;
+  right: 10px;
+}

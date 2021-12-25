@@ -21,13 +21,29 @@ $('#column_width').on('input', function() {
   $(':root').css('--column-width', this.value/$('.column').length+'vw');
 });
 
+var overlayID = 0
 $('#column_container').on('click', function(e) {
-  console.log($(e.target).parent().attr('id'))
+  window.overlayID = $(e.target).parent().attr('id')
   $('#overlay').append($(e.target).clone()).css('display','block')
 });
 $('#close').on('click', function(e) {
   $('#overlay').css('display','none')
   $('#overlay .art').remove()
+});
+$('#follow').on('click', function(e) {
+  window.open('https://derpibooru.org/images/'+window.data[window.overlayID].id, '_blank');
+});
+$('#next').on('click', function(e) {
+  window.overlayID++
+  $('#overlay .art').remove()
+  $('#overlay').append($('#'+overlayID+' .art').clone())
+});
+$('#auto').on('click', function(e) {
+  setInterval(function() {
+    window.overlayID++
+    $('#overlay .art').remove()
+    $('#overlay').append($('#'+overlayID+' .art').clone())
+  }, 5000)
 });
 
 function start() {
@@ -58,14 +74,22 @@ function getdata() {
   if (!$('#semi-grimdark').prop('checked')) exclude.push('!semi-grimdark');
   if (!$('#grimdark').prop('checked')) exclude.push('!grimdark');
   if (!$('#grotesque').prop('checked')) exclude.push('!grotesque');
+  if (!$('#animated').prop('checked')) exclude.push('!animated');
   if (exclude.length > 0) query += ' && ' + exclude.join(' && ');
+
+  var range = `score.gte:${$('#min_score').val()}`
+  query += ' && ' + range;
+
+
+  var sf = $('input[name="sf"]:checked').val()
+  console.log(sf)
 
   $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
     'per_page': '50',
     'page': window.page,
     'q': query,
     'filter_id': 56027,
-    'sf': 'score'
+    'sf': sf
   }).done(function(APIreply) {
     console.log(query)
     console.log(APIreply)
@@ -88,7 +112,7 @@ function getdata() {
 
 function renderimage() {
   if (window.paused) return;
-  if ($('html').height()-$(window).scrollTop() > 2*$(window).height()) return;
+  if (getShortestColumn().height()-$(window).scrollTop() > 2*$(window).height()) return;
 
   if (window.data[window.index] == undefined) {
     getdata();

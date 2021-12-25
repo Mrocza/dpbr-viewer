@@ -16,33 +16,55 @@
 
     <input type="checkbox" id="settings-button">
     <div id="settings">
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="safe" checked>
-        <span class="text">safe</span>
+        <span>safe</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="suggestive">
-        <span class="text">suggestive</span>
+        <span>suggestive</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="questionable">
-        <span class="text">questionable</span>
+        <span>questionable</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="explicit">
-        <span class="text">explicit</span>
+        <span>explicit</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="semi-grimdark">
-        <span class="text">semi-grimdark</span>
+        <span>semi-grimdark</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="grimdark">
-        <span class="text">grimdark</span>
+        <span>grimdark</span>
       </label>
-      <label class="custom-input">
+      <label>
         <input type="checkbox" id="grotesque">
-        <span class="text">grotesque</span>
+        <span>grotesque</span>
+      </label>
+      <label>
+        <input type="checkbox" id="animated">
+        <span>animated</span>
+      </label>
+      <br />
+      <label>
+        <input type="radio" name="sf" id="score" value="score" checked>
+        <span>score</span>
+      </label>
+      <label>
+        <input type="radio" name="sf" id="created_at" value="created_at">
+        <span>created_at</span>
+      </label>
+      <label>
+        <input type="radio" name="sf" id="random" value="random">
+        <span>random</span>
+      </label>
+      <br />
+      <label>
+        <input type="number" id="min_score" value="0">
+        <span>minumum score</span>
       </label>
     </div>
     <input type="range" id="column_width" min="10" max="85" value="85" step="1">
@@ -53,6 +75,9 @@
     </div>
     <div id="overlay">
       <button id="close">Close</button>
+      <button id="follow">Follow</button>
+      <button id="next">Next</button>
+      <button id="auto">Auto</button>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
