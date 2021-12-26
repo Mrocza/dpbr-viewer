@@ -6,20 +6,11 @@ var intervalId;
 
 // artist:derekireba
 // artist:holivi
-var screenAspectRatio = $(window).width()/$(window).height()
-if (screenAspectRatio > 1.7) {
-  $('#column_count').val(3)
-} else if (screenAspectRatio > 1) {
-  $('#column_count').val(2)
-} else {
-  $('#column_count').val(1)
-}
-$(':root').css('--column-width', $('#column_width').val()/$('#column_count').val()+'vw');
+$('#column_count').val(Math.ceil($(window).width()/400))
+
 
 $('#tags').on('change', start);
-$('#column_width').on('input', function() {
-  $(':root').css('--column-width', this.value/$('.column').length+'vw');
-});
+
 
 var overlayID = 0
 $('#column_container').on('click', function(e) {
