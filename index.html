@@ -17,46 +17,46 @@
     <input type="checkbox" id="settings-button">
     <div id="settings">
       <label>
-        <input type="checkbox" id="safe" checked> safe
+        <input class="filter" type="checkbox" id="safe" checked> safe
       </label>
       <label>
-        <input type="checkbox" id="suggestive"> suggestive
+        <input class="filter" type="checkbox" id="suggestive"> suggestive
       </label>
       <label>
-        <input type="checkbox" id="questionable"> questionable
+        <input class="filter" type="checkbox" id="questionable"> questionable
       </label>
       <label>
-        <input type="checkbox" id="explicit"> explicit
+        <input class="filter" type="checkbox" id="explicit"> explicit
       </label>
       <label>
-        <input type="checkbox" id="semi-grimdark">semi-grimdark
+        <input class="filter" type="checkbox" id="semi-grimdark"> semi-grimdark
       </label>
       <label>
-        <input type="checkbox" id="grimdark">grimdark
+        <input class="filter" type="checkbox" id="grimdark"> grimdark
       </label>
       <label>
-        <input type="checkbox" id="grotesque">grotesque
+        <input class="filter" type="checkbox" id="grotesque"> grotesque
       </label>
       <label>
-        <input type="checkbox" id="animated">animated
-      </label>
-      <br />
-      <label>
-        <input type="radio" name="sf" id="score" value="score" checked>
-        <span>score</span>
-      </label>
-      <label>
-        <input type="radio" name="sf" id="created_at" value="created_at">
-        <span>created_at</span>
-      </label>
-      <label>
-        <input type="radio" name="sf" id="random" value="random">
-        <span>random</span>
+        <input class="filter" type="checkbox" id="animated"> animated
       </label>
       <br />
       <label>
-        <input type="number" id="min_score" value="0">
-        <span>minumum score</span>
+        <input type="radio" name="sf" id="score" value="score" checked> score
+      </label>
+      <label>
+        <input type="radio" name="sf" id="created_at" value="created_at"> created_at
+      </label>
+      <label>
+        <input type="radio" name="sf" id="random" value="random"> random
+      </label>
+      <br />
+      <label>
+        <input type="range" id="min-score" min="-1000" max="4800" value="0">
+        <span id="min-score-text">0</span>
+
+        <input type="range" id="max-score" min="-1000" max="4800" value="4000">
+        <span id="max-score-text">4000</span>
       </label>
     </div>
     <input type="range" id="column_width" min="10" max="85" value="85" step="1">

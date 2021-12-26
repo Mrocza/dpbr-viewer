@@ -31,7 +31,7 @@ $('#close').on('click', function(e) {
   $('#overlay .art').remove()
 });
 $('#follow').on('click', function(e) {
-  window.open('https://furbooru.org/images/'+window.data[window.overlayID].id, '_blank');
+  window.open('https://derpibooru.org/images/'+window.data[window.overlayID].id, '_blank');
 });
 $('#next').on('click', function(e) {
   window.overlayID++
@@ -45,6 +45,24 @@ $('#auto').on('click', function(e) {
     $('#overlay').append($('#'+overlayID+' .art').clone())
   }, 5000)
 });
+
+$('#min-score').on('input', function() {
+  $('#min-score-text').html($(this).val());
+  if (+$(this).val() > $('#max-score').val()) {
+    $('#max-score').val($(this).val());
+    $('#max-score-text').html($(this).val());
+  }
+})
+$('#max-score').on('input', function() {
+  $('#max-score-text').html($(this).val());
+  if (+$(this).val() < $('#min-score').val()) {
+    $('#min-score').val($(this).val());
+    $('#min-score-text').html($(this).val());
+  }
+})
+
+
+
 
 function start() {
   window.paused = false;
@@ -109,25 +127,20 @@ function getdata() {
   var query = $('#tags').val();
   if (query == '') query = '*';
 
-  if (!$('#safe').prop('checked')) query += ' && !safe';
-  if (!$('#suggestive').prop('checked')) query += ' && !suggestive';
-  if (!$('#questionable').prop('checked')) query += ' && !questionable';
-  if (!$('#explicit').prop('checked')) query += ' && !explicit';
-  if (!$('#semi-grimdark').prop('checked')) query += ' && !semi-grimdark';
-  if (!$('#grimdark').prop('checked')) query += ' && !grimdark';
-  if (!$('#grotesque').prop('checked')) query += ' && !grotesque';
-  if (!$('#animated').prop('checked')) query += ' && !animated';
+  $('.filter').each( function() {
+    if (!$(this).prop('checked')) query += ' && !' + $(this).prop('id');
+  })
 
-  query += ` && score.gte:${$('#min_score').val()}`;
-
+  query += ` && score.gte:${$('#min-score').val()}`;
+  query += ` && score.lte:${$('#max-score').val()}`;
 
   var sf = $('input[name="sf"]:checked').val()
 
-  $.getJSON('https://furbooru.org/api/v1/json/search/images', {
+  $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
     'per_page': '50',
     'page': window.page,
     'q': query,
-    'filter_id': 2,//56027,
+    'filter_id': 56027,
     'sf': sf
   }).done(function(APIreply) {
     console.log(query)
