@@ -8,9 +8,10 @@ var intervalId;
 // artist:holivi
 $('#column_count').val(Math.ceil($(window).width()/400))
 
-
 $('#tags').on('change', start);
-
+$('#search-button').on('change', function() {
+  if ( !$(this).prop('checked') ) start()
+});
 
 var overlayID = 0
 $('#column_container').on('click', function(e) {
@@ -56,6 +57,7 @@ $('#max-score').on('input', function() {
 
 
 function start() {
+  $('#search-button').prop('checked', false)
   window.paused = false;
   window.page = 1;
   window.index = 0;
@@ -66,7 +68,7 @@ function start() {
     $('<div>', {'class':'column'}).appendTo('#column_container');
   }
   if (window.intervalId) clearInterval(window.intervalId);
-  window.intervalId = window.setInterval(renderimage, 100);
+  window.intervalId = window.setInterval(renderimage, 300/$('#column_count').val());
 }
 
 function renderimage() {
@@ -82,11 +84,18 @@ function renderimage() {
 }
 
 function createCard(data) {
-  var card = $('<div>', {
+  let card = $('<div>', {
     'id': window.index,
     'class': 'card',
     'css': { 'padding-bottom': 100/data.aspectRatio+'%' }
   })
+  let cardWidth = $('#column_container').width() / $('#column_count').val()
+  let cardHeight = cardWidth / data.aspectRatio
+  let src = data.tall
+  if (cardHeight < 1024) src = data.large
+  if (cardHeight <  600) src = data.medium
+  if (cardHeight <  250) src = data.small
+  if (cardHeight <  150) src = data.tiny
 
   switch (data.format) {
     case 'svg':
@@ -95,15 +104,15 @@ function createCard(data) {
     case 'gif':
       $('<img>', {
         'class': 'art',
-        'src': data.preview,
+        'src': src,
         'loading': 'lazy',
-      }).data(data).appendTo(card);
+      }).appendTo(card);
       break;
     case 'mp4':
     case 'webm':
       $('<video>', {
         'class': 'art',
-        'src': data.preview,
+        'src': data.medium,
       }).data(data).appendTo(card);
       break;
     default:
@@ -143,8 +152,11 @@ function getdata() {
         'id': image.id,
         'format': image.format,
         'aspectRatio': image.aspect_ratio,
-        'preview': image.representations.tall,
-        'full': image.representations.full,
+        'tall': image.representations.tall,
+        'large': image.representations.large,
+        'medium': image.representations.medium,
+        'small': image.representations.small,
+        'tiny': image.representations.thumb_small,
       })
     }
     window.page++

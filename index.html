@@ -9,9 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="topbar">
-      <input type="search" id="tags" required>
-      <label for="tags">Search for things here</label>
+    <input type="checkbox" id="search-button" checked>
+    <div id="search">
+      <label>
+        <input type="search" id="tags" required>
+        <span for="tags">Search for things here</span>
+      </label>
     </div>
 
     <input type="checkbox" id="settings-button">
@@ -52,16 +55,15 @@
       </label>
       <br />
       <label>
-        <input type="range" id="min-score" min="-1000" max="4800" value="0">
+        <input id="min-score" type="range" min="-1000" max="4800" step="1" value="0">
         <span id="min-score-text">0</span>
-
-        <input type="range" id="max-score" min="-1000" max="4800" value="4000">
+        <br />
+        <input id="max-score" type="range" min="-1000" max="4800" step="1" value="4000" >
         <span id="max-score-text">4000</span>
       </label>
+      <input type="number" id="column_count" min="1" max="10" value="2">
     </div>
-    <input type="range" id="column_width" min="10" max="85" value="85" step="1">
-    <input type="number" id="column_count" min="1" max="10" value="2">
-    <button type="button" onclick="start()">Give Me!</button>
+
     <div id="column_container"/>
       <!-- Generated dynamically -->
     </div>
