@@ -78,9 +78,14 @@ function renderimage() {
   if (window.paused) return;
   if (getShortestColumn().height()-$(window).scrollTop() > 2*$(window).height()) return;
 
-
-  for (let array of window.inData) {
-    window.data = window.data.concat(array)
+  const interleave = ([ x, ...xs ], ...rest) =>
+  x === undefined
+    ? rest.length === 0
+      ? []                               // base: no x, no rest
+      : interleave (...rest)             // inductive: no x, some rest
+    : [ x, ...interleave(...rest, xs) ]  // inductive: some x, some rest
+  if (window.inData.length != 0) {
+    window.data = window.data.concat(interleave(...window.inData))
   }
   window.inData = [];
 
