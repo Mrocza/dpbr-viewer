@@ -1,6 +1,7 @@
 var page = 1;
 var index = 0;
-var data;
+var data = [];
+var inData = [];
 var paused;
 var intervalId;
 
@@ -59,10 +60,11 @@ $('#max-score').on('input', function() {
 
 function start() {
   $('#search-button').prop('checked', false)
-  window.paused = false;
+  window.paused = 0;
   window.page = 1;
   window.index = 0;
   window.data = [];
+  window.inData = [];
 
   $('#column_container').empty();
   for (var i = 0; i < $('#column_count').val(); i++) {
@@ -76,11 +78,19 @@ function renderimage() {
   if (window.paused) return;
   if (getShortestColumn().height()-$(window).scrollTop() > 2*$(window).height()) return;
 
+
+  for (let array of window.inData) {
+    window.data = window.data.concat(array)
+  }
+  window.inData = [];
+
   if (window.data[window.index] == undefined) {
-    getPhilomena();
-    getGelbooru();
+    if ($('#derpibooru').prop('checked')) getPhilomena();
+    if ($('#rule34').prop('checked')) getGelbooru();
+    if ($('#e621').prop('checked')) getE621();
     return;
   }
+
   createCard(window.data[window.index]).appendTo(getShortestColumn());
   window.index++;
 }
@@ -119,7 +129,7 @@ function createCard(data) {
 }
 
 function getPhilomena() {
-  window.paused = true;
+  window.paused++;
 
   var query = $('#tags').val();
   if (query == '') query = '*';
@@ -143,9 +153,9 @@ function getPhilomena() {
   }).done(function(APIreply) {
     console.log(APIreply)
     if (APIreply.images.length == 0) return;
-
+    let array = []
     for(var image of APIreply.images) {
-      window.data.push({
+      array.push({
         'id': image.id,
         'url': 'https://derpibooru.org/images/'+image.id,
         'format': image.format,
@@ -183,19 +193,17 @@ function getPhilomena() {
             'h': (image.aspect_ratio < 1) ? 50 : 50/image.aspect_ratio,
             'link': image.representations.thumb_tiny
           }],
-      })
+      });
     }
+    window.inData.push(array);
     window.page++
-    window.paused = false;
+    window.paused--;
   })
 
 }
 
-
-
-
 function getGelbooru() {
-  window.paused = true;
+  window.paused++;
 
   var query = $('#tags').val();
   if (query == '') query = '*';
@@ -232,9 +240,9 @@ function getGelbooru() {
   }).done(function(APIreply) {
     console.log(APIreply)
     if (APIreply.length == 0) return;
-
+    let array = [];
     for(var image of APIreply) {
-      window.data.push({
+      array.push({
         'id': image.id,
         'url': 'https://rule34.xxx/index.php?page=post&s=view&id='+image.id,
         'format': image.file_url.split('.').pop().trim(),
@@ -252,14 +260,75 @@ function getGelbooru() {
             'h': (image.width<image.height) ? 250 : 250/image.width/image.height,
             'link': image.preview_url
           }],
-      })
+      });
     }
+    window.inData.push(array);
     window.page++
-    window.paused = false;
+    window.paused--;
   })
-
 }
 
+function getE621() {
+  window.paused++;
+
+  var query = $('#tags').val();
+  if (query == '') query = '*';
+
+  $('.filter').each( function() {
+    if (!$(this).prop('checked')) query += ', -' + $(this).prop('id');
+  })
+
+  if ($('#min-score').val() != -1000)
+    query += ', score:>=' + $('#min-score').val();
+  if ($('#max-score').val() !=  5000)
+    query += ', score:<=' + $('#max-score').val();
+
+
+  query = query.replaceMultiple({
+    'safe':'rating:safe',
+    'questionable': 'rating:questionable',
+    'explicit': 'rating:explicit',
+    '([A-z]) ([A-z])': '\1_\2',
+    ',': ''
+  })
+
+  query += ' order:'+$('input[name="sf"]:checked').val()
+
+  console.log(query)
+  $.getJSON('https://e621.net/posts.json', {
+    'page': window.page,
+    'limit': 50,
+    'tags': query
+  }).done(function(APIreply) {
+    console.log(APIreply)
+    if (APIreply.posts.length == 0) return;
+    let array = [];
+    for(var image of APIreply.posts) {
+      array.push({
+        'id': image.id,
+        'url': 'https://e621.net/posts/'+image.id,
+        'format': image.file.ext,
+        'aspectRatio': image.file.width / image.file.height,
+        'images': [
+          { 'w': image.file.width,
+            'h': image.file.height,
+            'link': image.file.url
+          },
+          { 'w': image.sample.width,
+            'h': image.sample.height,
+            'link': image.sample.url
+          },
+          { 'w': image.preview.width,
+            'h': image.preview.height,
+            'link': image.preview.url
+          }],
+      });
+    }
+    window.inData.push(array);
+    window.page++
+    window.paused--;
+  })
+}
 
 
 
