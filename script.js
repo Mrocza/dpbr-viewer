@@ -78,14 +78,9 @@ function renderimage() {
   if (window.paused) return;
   if (getShortestColumn().height()-$(window).scrollTop() > 2*$(window).height()) return;
 
-  const interleave = ([ x, ...xs ], ...rest) =>
-  x === undefined
-    ? rest.length === 0
-      ? []                               // base: no x, no rest
-      : interleave (...rest)             // inductive: no x, some rest
-    : [ x, ...interleave(...rest, xs) ]  // inductive: some x, some rest
+
   if (window.inData.length != 0) {
-    window.data = window.data.concat(interleave(...window.inData))
+    window.data = window.data.concat(braidArrays(...window.inData))
   }
   window.inData = [];
 
@@ -135,18 +130,23 @@ function createCard(data) {
 
 function getPhilomena() {
   window.paused++;
-
   var query = $('#tags').val();
   if (query == '') query = '*';
 
-  $('.filter').each( function() {
-    if (!$(this).prop('checked')) query += ', -' + $(this).prop('id');
-  })
+  let safe = $('#safe').prop('checked'),
+      questionable = $('#questionable').prop('checked'),
+      explicit = $('#explicit').prop('checked'),
+      animated = $('#animated').prop('checked');
+  if (!safe) query += ', -safe';
+  if (!questionable) query += ', -suggestive, -questionable';
+  if (!explicit) query += ', -explicit';
+  if (!animated) query += ', -animated';
 
   if ($('#min-score').val() != -1000)
     query += `, score.gte:${$('#min-score').val()}`;
   if ($('#max-score').val() !=  5000)
     query += `, score.lte:${$('#max-score').val()}`;
+
 
   console.log(query)
   $.getJSON('https://derpibooru.org/api/v1/json/search/images', {
@@ -205,6 +205,78 @@ function getPhilomena() {
     window.paused--;
   })
 
+}
+
+
+
+function getE621() {
+  window.paused++;
+  var query = $('#tags').val()
+    .replace(/([A-z]) ([A-z])/g,'\1_\2')
+    .replace(/,/g, '');
+  query += ' order:'+$('input[name="sf"]:checked').val()
+
+  if ($('#min-score').val() != -1000)
+    query += ' score:>=' + $('#min-score').val();
+  if ($('#max-score').val() !=  5000)
+    query += ' score:<=' + $('#max-score').val();
+
+  let safe = $('#safe').prop('checked'),
+      questionable = $('#questionable').prop('checked'),
+      explicit = $('#explicit').prop('checked'),
+      animated = $('#animated').prop('checked');
+  if (!animated) query += ' -animated';
+  if (safe && !questionable && !explicit) query += ' rating:s';
+  if (!safe && questionable && explicit) query += ' -rating:s';
+  if (!safe && questionable && !explicit) query += ' rating:q';
+  if (safe && !questionable && explicit) query += ' -rating:q';
+  if (!safe && !questionable && explicit) query += ' rating:e';
+  if (safe && questionable && !explicit) query += ' -rating:e';
+  if (safe && questionable && !explicit) query += ' -rating:e';
+  if (!safe && !questionable && !explicit) query = 'invalid';
+
+
+
+
+
+
+
+
+
+  console.log(query)
+  $.getJSON('https://e621.net/posts.json', {
+    'page': window.page,
+    'limit': 50,
+    'tags': query
+  }).done(function(APIreply) {
+    console.log(APIreply)
+    if (APIreply.posts.length == 0) return;
+    let array = [];
+    for(var image of APIreply.posts) {
+      array.push({
+        'id': image.id,
+        'url': 'https://e621.net/posts/'+image.id,
+        'format': image.file.ext,
+        'aspectRatio': image.file.width / image.file.height,
+        'images': [
+          { 'w': image.file.width,
+            'h': image.file.height,
+            'link': image.file.url
+          },
+          { 'w': image.sample.width,
+            'h': image.sample.height,
+            'link': image.sample.url
+          },
+          { 'w': image.preview.width,
+            'h': image.preview.height,
+            'link': image.preview.url
+          }],
+      });
+    }
+    window.inData.push(array);
+    window.page++
+    window.paused--;
+  })
 }
 
 function getGelbooru() {
@@ -273,70 +345,6 @@ function getGelbooru() {
   })
 }
 
-function getE621() {
-  window.paused++;
-
-  var query = $('#tags').val();
-  if (query == '') query = '*';
-
-  $('.filter').each( function() {
-    if (!$(this).prop('checked')) query += ', -' + $(this).prop('id');
-  })
-
-  if ($('#min-score').val() != -1000)
-    query += ', score:>=' + $('#min-score').val();
-  if ($('#max-score').val() !=  5000)
-    query += ', score:<=' + $('#max-score').val();
-
-
-  query = query.replaceMultiple({
-    'safe':'rating:safe',
-    'questionable': 'rating:questionable',
-    'explicit': 'rating:explicit',
-    '([A-z]) ([A-z])': '\1_\2',
-    ',': ''
-  })
-
-  query += ' order:'+$('input[name="sf"]:checked').val()
-
-  console.log(query)
-  $.getJSON('https://e621.net/posts.json', {
-    'page': window.page,
-    'limit': 50,
-    'tags': query
-  }).done(function(APIreply) {
-    console.log(APIreply)
-    if (APIreply.posts.length == 0) return;
-    let array = [];
-    for(var image of APIreply.posts) {
-      array.push({
-        'id': image.id,
-        'url': 'https://e621.net/posts/'+image.id,
-        'format': image.file.ext,
-        'aspectRatio': image.file.width / image.file.height,
-        'images': [
-          { 'w': image.file.width,
-            'h': image.file.height,
-            'link': image.file.url
-          },
-          { 'w': image.sample.width,
-            'h': image.sample.height,
-            'link': image.sample.url
-          },
-          { 'w': image.preview.width,
-            'h': image.preview.height,
-            'link': image.preview.url
-          }],
-      });
-    }
-    window.inData.push(array);
-    window.page++
-    window.paused--;
-  })
-}
-
-
-
 function formatNumber(num) {
   if (num < -1e3) return (num/1e3).toFixed(1) + 'k';
   if (num <  1e3) return num;
@@ -376,3 +384,10 @@ String.prototype.replaceMultiple = function(obj) {
   }
   return output;
 };
+function braidArrays([x, ...xs], ...rest) {
+  if (x == undefined) {
+    if (rest.length == 0) return [];
+    else return braidArrays(...rest);
+  }
+  return [x, ...braidArrays(...rest, xs)];
+}
