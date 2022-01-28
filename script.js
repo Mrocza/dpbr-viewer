@@ -9,7 +9,11 @@ var intervalId;
 // artist:holivi
 $('#column_count').val(Math.ceil($(window).width()/400))
 
-$('#tags').on('change', start);
+$("#tags").on('keyup', function(e) {
+    if (e.keyCode == 13) {
+        $("#search-button").click();
+    }
+});
 $('#search-button').on('change', function() {
   if ( !$(this).prop('checked') ) start()
 });
@@ -234,14 +238,6 @@ function getE621() {
   if (safe && questionable && !explicit) query += ' -rating:e';
   if (safe && questionable && !explicit) query += ' -rating:e';
   if (!safe && !questionable && !explicit) query = 'invalid';
-
-
-
-
-
-
-
-
 
   console.log(query)
   $.getJSON('https://e621.net/posts.json', {
