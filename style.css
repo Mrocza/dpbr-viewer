@@ -145,6 +145,8 @@ input[type="search"]:focus + span {
 #overlay {
   position: fixed;
   display: none;
+  align-items: center;
+  justify-content: center;
   backdrop-filter: blur(20px);
   top: 0;
   bottom: 0;
@@ -153,25 +155,21 @@ input[type="search"]:focus + span {
   z-index: 50;
 }
 #overlay .art {
+  width: auto;
   object-fit: contain;
 }
 #overlay button {
   position: absolute;
   z-index: 5;
+  right: 10px;
 }
-#close {
+#close { top: 10px; }
+#follow { top: 30px; }
+#next { top: 50px; }
+#auto { top: 90px; }
+#taglist {
+  position: absolute;
+  z-index: 5;
   top: 10px;
-  right: 10px;
-}
-#follow{
-  top: 30px;
-  right: 10px;
-}
-#next{
-  top: 50px;
-  right: 10px;
-}
-#auto{
-  top: 90px;
-  right: 10px;
+  left: 10px;
 }

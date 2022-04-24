@@ -10,18 +10,21 @@
   </head>
   <body>
     <input type="checkbox" id="search-button" checked>
-    <div id="search">
+    <form id="search" autocomplete="off">
       <label>
         <input type="search" id="tags" required>
-        <span for="tags">Search for things here</span>
+        <span></span>
+        <div id="autocomplete">
+
+        </div>
       </label>
       <br />
       <label>
         <input class="booru" type="checkbox" id="derpibooru" checked> derpibooru
       </label>
-      <label>
+      <!-- <label>
         <input class="booru" type="checkbox" id="rule34"> rule34
-      </label>
+      </label> -->
       <label>
         <input class="booru" type="checkbox" id="e621"> e621
       </label>
@@ -57,7 +60,7 @@
         <span id="max-score-text">5000</span>
       </label>
       <input type="number" id="column_count" min="1" max="10" value="2">
-    </div>
+    </form>
 
     <div id="column_container"/>
       <!-- Generated dynamically -->
@@ -67,8 +70,10 @@
       <button id="follow">Follow</button>
       <button id="next">Next</button>
       <button id="auto">Auto</button>
+      <div id="taglist"></div>
     </div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="taglist.json"></script>
     <script type="text/javascript" src="script.js"></script>
   </body>
 </html>

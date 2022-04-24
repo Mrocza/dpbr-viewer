@@ -9,23 +9,60 @@ var intervalId;
 // artist:holivi
 $('#column_count').val(Math.ceil($(window).width()/400))
 
-$("#tags").on('keyup', function(e) {
-    if (e.keyCode == 13) {
-        $("#search-button").click();
-    }
-});
 $('#search-button').on('change', function() {
   if ( !$(this).prop('checked') ) start()
 });
+$("#tags").on('keyup', function(e) {
+  if (e.keyCode == 13) $("#search-button").click();
+});
+$("#tags").on('input', function(e) {
+
+  return // autocomplete disabled
+
+  if ($("#tags").val().length < 1) {
+    $("#autocomplete").html('')
+    return;
+  }
+  for (let tag of TAGS621) {
+    if ( tag[0].includes == undefined ) console.log(tag);
+    if ( tag[0].startsWith($("#tags").val()) ) {
+      $("#autocomplete").html(tag[0]); return;
+    }
+  }
+
+});
+
+
+
+
+
 
 var overlayID = 0
 $('#column_container').on('click', function(e) {
-  window.overlayID = $(e.target).parent().prop('id')
-  $('#overlay').append($(e.target).clone()).css('display','block')
+  let art = $(e.target)
+  if (art.prop('class') != 'art') return;
+  window.overlayID = art.parent().prop('id');
+  console.log(window.data[window.overlayID])
+  $('#overlay').append(art.clone())
+  $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
+    'display':'flex'
+  })
+  for (let tag of window.data[window.overlayID].tags) {
+    $('#taglist').append($('<div>', {
+      'html': '- + '+tag
+    }))
+  }
+});
+$('#overlay').on('click', function(e) {
+  if ($(e.target).prop('id') != 'overlay') return;
+  $('#overlay').css('display','none');
+  $('#overlay .art').remove();
+  $('#taglist div').remove();
 });
 $('#close').on('click', function(e) {
-  $('#overlay').css('display','none')
-  $('#overlay .art').remove()
+  $('#overlay').css('display','none');
+  $('#overlay .art').remove();
+  $('#taglist div').remove();
 });
 $('#follow').on('click', function(e) {
   console.log(window.data[window.overlayID].url)
@@ -35,14 +72,21 @@ $('#next').on('click', function(e) {
   window.overlayID++
   $('#overlay .art').remove()
   $('#overlay').append($('#'+overlayID+' .art').clone())
+  $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
+    'display':'block'
+  })
 });
 $('#auto').on('click', function(e) {
   setInterval(function() {
     window.overlayID++
     $('#overlay .art').remove()
     $('#overlay').append($('#'+overlayID+' .art').clone())
+    $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
+      'display':'block'
+    })
   }, 5000)
 });
+
 
 $('#min-score').on('input', function() {
   $('#min-score-text').html($(this).val());
@@ -70,6 +114,7 @@ function start() {
   window.data = [];
   window.inData = [];
 
+  $('img').prop('src','');
   $('#column_container').empty();
   for (var i = 0; i < $('#column_count').val(); i++) {
     $('<div>', {'class':'column'}).appendTo('#column_container');
@@ -112,24 +157,7 @@ function createCard(data) {
     if (image.w > cardWidth || image.h > cardHeight) src = image.link;
   }
 
-  switch (data.format) {
-    case 'svg': case 'png': case 'jpg': case 'jpeg': case 'gif':
-      $('<img>', {
-        'class': 'art',
-        'src': src,
-        'loading': 'lazy',
-      }).appendTo(card);
-      break;
-    case 'mp4': case 'webm':
-      $('<video>', {
-        'class': 'art',
-        'src': src,
-      }).data(data).appendTo(card);
-      break;
-    default:
-      console.log('Unknown format "'+data.format+'" on ' + data.id);
-  }
-  return card;
+  return card.append(packageArt(src));
 }
 
 function getPhilomena() {
@@ -169,6 +197,7 @@ function getPhilomena() {
         'url': 'https://derpibooru.org/images/'+image.id,
         'format': image.format,
         'aspectRatio': image.aspect_ratio,
+        'tags': image.tags,
         'images': [
           { 'w': image.width,
             'h': image.height,
@@ -211,8 +240,6 @@ function getPhilomena() {
 
 }
 
-
-
 function getE621() {
   window.paused++;
   var query = $('#tags').val()
@@ -230,14 +257,14 @@ function getE621() {
       explicit = $('#explicit').prop('checked'),
       animated = $('#animated').prop('checked');
   if (!animated) query += ' -animated';
-  if (safe && !questionable && !explicit) query += ' rating:s';
-  if (!safe && questionable && explicit) query += ' -rating:s';
-  if (!safe && questionable && !explicit) query += ' rating:q';
-  if (safe && !questionable && explicit) query += ' -rating:q';
-  if (!safe && !questionable && explicit) query += ' rating:e';
-  if (safe && questionable && !explicit) query += ' -rating:e';
-  if (safe && questionable && !explicit) query += ' -rating:e';
-  if (!safe && !questionable && !explicit) query = 'invalid';
+  if ( safe && !questionable && !explicit) query += ' rating:s';
+  if (!safe &&  questionable &&  explicit) query += ' -rating:s';
+  if (!safe &&  questionable && !explicit) query += ' rating:q';
+  if ( safe && !questionable &&  explicit) query += ' -rating:q';
+  if (!safe && !questionable &&  explicit) query += ' rating:e';
+  if ( safe &&  questionable && !explicit) query += ' -rating:e';
+  if ( safe &&  questionable && !explicit) query += ' -rating:e';
+  if (!safe && !questionable && !explicit) query  = 'invalid';
 
   console.log(query)
   $.getJSON('https://e621.net/posts.json', {
@@ -254,6 +281,7 @@ function getE621() {
         'url': 'https://e621.net/posts/'+image.id,
         'format': image.file.ext,
         'aspectRatio': image.file.width / image.file.height,
+        'tags': image.tags.general,
         'images': [
           { 'w': image.file.width,
             'h': image.file.height,
@@ -341,6 +369,24 @@ function getGelbooru() {
   })
 }
 
+function packageArt(source) {
+  switch (source.split('.').pop()) {
+    case 'svg': case 'png': case 'jpg': case 'jpeg': case 'gif':
+      return $('<img>', {
+        'class': 'art',
+        'src': source,
+        'loading': 'lazy',
+      });
+    case 'mp4': case 'webm':
+      return $('<video>', {
+        'class': 'art',
+        'src': source,
+      });
+    default:
+      console.log(`Unknown format "${data.format}" on ${data.id}`);
+      return $('<img>')
+  }
+}
 function formatNumber(num) {
   if (num < -1e3) return (num/1e3).toFixed(1) + 'k';
   if (num <  1e3) return num;
