@@ -35,53 +35,57 @@ $("#tags").on('input', function(e) {
 
 
 
-
-
-var overlayID = 0
-function clearOverlay() {
-  $('#overlay').css('display','none');
-  $('#overlay .art').remove();
-  $('#taglist div').remove();
-}
-function showOverlay() {
-  $('#overlay').append($('#'+overlayID+' .art').clone())
-  $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
-    'display':'flex'
-  })
-  for (let tag of window.data[window.overlayID].tags) {
-    $('#taglist').append($('<div>', {
-      'html': '- + '+tag
-    }))
+class overlayObject {
+  constructor (ID) {
+    this.ID = ID;
+  }
+  clear() {
+    $('#overlay').css('display','none');
+    $('#overlay .art').remove();
+    $('#taglist div').remove();
+  }
+  show() {
+    $('#overlay').append($('#'+this.ID+' .art').clone())
+    $('#overlay').append(packageArt(window.data[this.ID].images[0].link)).css({
+      'display':'flex'
+    })
+    for (let tag of window.data[this.ID].tags) {
+      $('#taglist').append($('<div>', {
+        'html': '- + '+tag
+      }))
+    }
   }
 }
+var overlay = new overlayObject(0);
+
 $('body').on('click', function(e) {
   console.log(e.target)
   switch (e.target.id) {
     case 'overlay':
     case 'close':
-      clearOverlay();
+      overlay.clear();
       return;
     case 'follow':
       window.open(window.data[window.overlayID].url, '_blank');
       return;
     case 'next':
-      window.overlayID++
-      clearOverlay();
-      showOverlay();
+      overlay.ID++
+      overlay.clear();
+      overlay.show();
       return;
     case 'auto':
       setInterval(function() {
-        window.overlayID++
-        clearOverlay();
-        showOverlay();
+        overlay.ID++
+        overlay.clear();
+        overlay.show();
       }, 5000);
       return;
   }
   switch (e.target.className) {
     case 'art':
-      window.overlayID = $(e.target).parent().prop('id');
-      clearOverlay();
-      showOverlay();
+      overlay.ID = $(e.target).parent().prop('id');
+      overlay.clear();
+      overlay.show();
       return;
   }
 });
