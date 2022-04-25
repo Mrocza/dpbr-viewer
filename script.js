@@ -38,12 +38,13 @@ $("#tags").on('input', function(e) {
 
 
 var overlayID = 0
-$('#column_container').on('click', function(e) {
-  let art = $(e.target)
-  if (art.prop('class') != 'art') return;
-  window.overlayID = art.parent().prop('id');
-  console.log(window.data[window.overlayID])
-  $('#overlay').append(art.clone())
+function clearOverlay() {
+  $('#overlay').css('display','none');
+  $('#overlay .art').remove();
+  $('#taglist div').remove();
+}
+function showOverlay() {
+  $('#overlay').append($('#'+overlayID+' .art').clone())
   $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
     'display':'flex'
   })
@@ -52,39 +53,37 @@ $('#column_container').on('click', function(e) {
       'html': '- + '+tag
     }))
   }
-});
-$('#overlay').on('click', function(e) {
-  if ($(e.target).prop('id') != 'overlay') return;
-  $('#overlay').css('display','none');
-  $('#overlay .art').remove();
-  $('#taglist div').remove();
-});
-$('#close').on('click', function(e) {
-  $('#overlay').css('display','none');
-  $('#overlay .art').remove();
-  $('#taglist div').remove();
-});
-$('#follow').on('click', function(e) {
-  console.log(window.data[window.overlayID].url)
-  window.open(window.data[window.overlayID].url, '_blank');
-});
-$('#next').on('click', function(e) {
-  window.overlayID++
-  $('#overlay .art').remove()
-  $('#overlay').append($('#'+overlayID+' .art').clone())
-  $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
-    'display':'block'
-  })
-});
-$('#auto').on('click', function(e) {
-  setInterval(function() {
-    window.overlayID++
-    $('#overlay .art').remove()
-    $('#overlay').append($('#'+overlayID+' .art').clone())
-    $('#overlay').append(packageArt(window.data[window.overlayID].images[0].link)).css({
-      'display':'block'
-    })
-  }, 5000)
+}
+$('body').on('click', function(e) {
+  console.log(e.target)
+  switch (e.target.id) {
+    case 'overlay':
+    case 'close':
+      clearOverlay();
+      return;
+    case 'follow':
+      window.open(window.data[window.overlayID].url, '_blank');
+      return;
+    case 'next':
+      window.overlayID++
+      clearOverlay();
+      showOverlay();
+      return;
+    case 'auto':
+      setInterval(function() {
+        window.overlayID++
+        clearOverlay();
+        showOverlay();
+      }, 5000);
+      return;
+  }
+  switch (e.target.className) {
+    case 'art':
+      window.overlayID = $(e.target).parent().prop('id');
+      clearOverlay();
+      showOverlay();
+      return;
+  }
 });
 
 
