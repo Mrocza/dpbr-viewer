@@ -36,8 +36,8 @@ $("#tags").on('input', function(e) {
 
 
 class overlayObject {
-  constructor (ID) {
-    this.ID = ID;
+  constructor () {
+    this.ID = 0;
   }
   clear() {
     $('#overlay').css('display','none');
@@ -56,7 +56,7 @@ class overlayObject {
     }
   }
 }
-var overlay = new overlayObject(0);
+var overlay = new overlayObject();
 
 $('body').on('click', function(e) {
   console.log(e.target)
@@ -306,72 +306,6 @@ function getE621() {
   })
 }
 
-function getGelbooru() {
-  window.paused++;
-
-  var query = $('#tags').val();
-  if (query == '') query = '*';
-
-  $('.filter').each( function() {
-    if (!$(this).prop('checked')) query += ', -' + $(this).prop('id');
-  })
-
-  if ($('#min-score').val() != -1000)
-    query += ', score:>=' + $('#min-score').val();
-  if ($('#max-score').val() !=  5000)
-    query += ', score:<=' + $('#max-score').val();
-
-
-  query = query.replaceMultiple({
-    'safe':'rating:safe',
-    'questionable': 'rating:questionable',
-    'explicit': 'rating:explicit',
-    '([A-z]) ([A-z])': '\1_\2',
-    ',': ''
-  })
-
-  query += ' sort:'+$('input[name="sf"]:checked').val()
-
-  console.log(query)
-  $.getJSON('https://api.rule34.xxx/index.php', {
-    'page': 'dapi',
-    's': 'post',
-    'json': 1,
-    'limit': 50,
-    'pid': window.page-1,
-    'q': 'index',
-    'tags': query
-  }).done(function(APIreply) {
-    console.log(APIreply)
-    if (APIreply.length == 0) return;
-    let array = [];
-    for(var image of APIreply) {
-      array.push({
-        'id': image.id,
-        'url': 'https://rule34.xxx/index.php?page=post&s=view&id='+image.id,
-        'format': image.file_url.split('.').pop().trim(),
-        'aspectRatio': image.width / image.height,
-        'images': [
-          { 'w': image.width,
-            'h': image.height,
-            'link': image.file_url
-          },
-          { 'w': image.sample_width,
-            'h': image.sample_height,
-            'link': image.sample_url
-          },
-          { 'w': (image.width>image.height) ? 250 : 250*image.width/image.height,
-            'h': (image.width<image.height) ? 250 : 250/image.width/image.height,
-            'link': image.preview_url
-          }],
-      });
-    }
-    window.inData.push(array);
-    window.page++
-    window.paused--;
-  })
-}
-
 function packageArt(source) {
   switch (source.split('.').pop()) {
     case 'svg': case 'png': case 'jpg': case 'jpeg': case 'gif':
@@ -422,13 +356,6 @@ function getShortestColumn() {
   });
   return output
 }
-String.prototype.replaceMultiple = function(obj) {
-  let output = this;
-  for (let key in obj) {
-    output = output.replace(new RegExp(key,'g'), obj[key]);
-  }
-  return output;
-};
 function braidArrays([x, ...xs], ...rest) {
   if (x == undefined) {
     if (rest.length == 0) return [];
