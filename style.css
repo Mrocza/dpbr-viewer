@@ -172,4 +172,30 @@ input[type="search"]:focus + span {
   z-index: 5;
   top: 10px;
   left: 10px;
+  overflow-y: scroll;
+  max-height: 100%;
+}
+.tag {
+  display: table;
+  margin-bottom: 4px;
+  background: black;
+  padding: 4px;
+  padding-right: 8px;
+  border-radius: 8px;
+}
+abbr {
+  display: inline-block;
+  width: 13px;
+  margin-right: 4px;
+  border-radius: 4px;
+  text-decoration: none;
+  text-align: center;
+}
+.add {
+  background: darkgreen;
+  cursor: pointer;
+}
+.remove {
+  background: darkred;
+  cursor: pointer;
 }

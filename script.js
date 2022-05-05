@@ -40,19 +40,39 @@ class overlayObject {
     this.ID = 0;
   }
   clear() {
+    $('body').css('overflow-y','scroll');
     $('#overlay').css('display','none');
     $('#overlay .art').remove();
     $('#taglist div').remove();
   }
   show() {
-    $('#overlay').append($('#'+this.ID+' .art').clone())
-    $('#overlay').append(packageArt(window.data[this.ID].images[0].link)).css({
-      'display':'flex'
-    })
+    $('body').css('overflow-y','hidden');
+    $('#overlay').css('display','flex');
+    $('#overlay').append($('#'+this.ID+' .art').clone());
+    $('#overlay').append(packageArt(window.data[this.ID].images[0].link));
     for (let tag of window.data[this.ID].tags) {
-      $('#taglist').append($('<div>', {
-        'html': '- + '+tag
-      }))
+      $('#taglist').append(
+        $('<div>', {
+          'class': 'tag'
+        }).append(
+          $('<abbr>', {
+            'html':'+',
+            'class':'add',
+            'data-tag': tag,
+            'title':'Add to current search'
+          }),
+          $('<abbr>', {
+            'html':'-',
+            'class':'remove',
+            'data-tag': tag,
+            'title':'Remove from current search'
+          }),
+          $('<span>', {
+            'html': tag,
+            'class': 'tagname'
+          })
+        )
+      )
     }
   }
 }
@@ -66,7 +86,7 @@ $('body').on('click', function(e) {
       overlay.clear();
       return;
     case 'follow':
-      window.open(window.data[window.overlayID].url, '_blank');
+      window.open(window.data[overlay.ID].url, '_blank');
       return;
     case 'next':
       overlay.ID++
@@ -86,6 +106,21 @@ $('body').on('click', function(e) {
       overlay.ID = $(e.target).parent().prop('id');
       overlay.clear();
       overlay.show();
+      return;
+    case 'tagname':
+      $('#tags').val( $(e.target).html());
+      overlay.clear()
+      start()
+      return;
+    case 'add':
+      $('#tags').val( $('#tags').val() + ', ' + $(e.target).data('tag'));
+      overlay.clear()
+      start()
+      return;
+    case 'remove':
+      $('#tags').val( $('#tags').val() + ', -' + $(e.target).data('tag'));
+      overlay.clear()
+      start()
       return;
   }
 });
@@ -125,7 +160,6 @@ function start() {
   if (window.intervalId) clearInterval(window.intervalId);
   window.intervalId = window.setInterval(renderimage, 300/$('#column_count').val());
 }
-
 function renderimage() {
   if (window.paused) return;
   if (getShortestColumn().height()-$(window).scrollTop() > 2*$(window).height()) return;
@@ -146,7 +180,6 @@ function renderimage() {
   createCard(window.data[window.index]).appendTo(getShortestColumn());
   window.index++;
 }
-
 function createCard(data) {
   let card = $('<div>', {
     'id': window.index,
@@ -165,7 +198,7 @@ function createCard(data) {
 
 function getPhilomena() {
   window.paused++;
-  var query = $('#tags').val();
+  var query = $('#tags').val().replace(/^[,\s]+|[,\s]+$/g, '');;
   if (query == '') query = '*';
 
   let safe = $('#safe').prop('checked'),
@@ -200,7 +233,7 @@ function getPhilomena() {
         'url': 'https://derpibooru.org/images/'+image.id,
         'format': image.format,
         'aspectRatio': image.aspect_ratio,
-        'tags': image.tags,
+        'tags': image.tags.sort(),
         'images': [
           { 'w': image.width,
             'h': image.height,
@@ -278,7 +311,8 @@ function getE621() {
     console.log(APIreply)
     if (APIreply.posts.length == 0) return;
     let array = [];
-    for(var image of APIreply.posts) {
+    for (var image of APIreply.posts) {
+      if (image.file.url == null) continue;
       array.push({
         'id': image.id,
         'url': 'https://e621.net/posts/'+image.id,
